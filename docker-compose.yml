@@ -1,6 +1,6 @@
 services:
   stats-server:
-    build: ./stats/stats-svc
+    build: ./stats/stats-svc  
     image: stats-server
     container_name: stats-server
     ports:
@@ -31,7 +31,7 @@ services:
   ewm-service:
     build: ./main-service
     image: ewm-service
-    container_name: ewm-service  
+    container_name: ewm-service
     ports:
       - "8080:8080"
     depends_on:

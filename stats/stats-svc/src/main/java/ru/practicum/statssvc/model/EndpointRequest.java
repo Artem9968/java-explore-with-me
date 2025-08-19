@@ -1,4 +1,4 @@
-package ru.practicum.statsvc.model;
+package ru.practicum.statssvc.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,17 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EndpointHit {
+
+public class EndpointRequest {
+
     private Integer id;
+
     private String app;
+
     private String uri;
+
     private String ip;
+
     private LocalDateTime timestamp;
+
 }

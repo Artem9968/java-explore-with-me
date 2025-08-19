@@ -1,4 +1,4 @@
-package ru.practicum.statclient;
+package ru.practicum.statsclient;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -26,16 +26,6 @@ public class BaseClient {
         return responseBuilder.build();
     }
 
-    /**
-     * Формируем и отправляем http запрос на сервер
-     *
-     * @param method     - метод запроса
-     * @param path       - эндпоинт
-     * @param parameters - карта параметров
-     * @param body       - тело запроса
-     * @param <T>        - тип объекта тела запроса
-     * @return - ResponseEntity
-     */
     protected <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
                                                             String path,
                                                             Map<String, Object> parameters,

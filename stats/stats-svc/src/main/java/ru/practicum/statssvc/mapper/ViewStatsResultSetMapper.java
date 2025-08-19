@@ -1,15 +1,15 @@
-package ru.practicum.statsvc.mapper;
+package ru.practicum.statssvc.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.practicum.statsvc.model.ViewStats;
+import ru.practicum.statssvc.model.EndpointStats;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ViewStatsRowMapper implements RowMapper<ViewStats> {
+public class ViewStatsResultSetMapper implements RowMapper<EndpointStats> {
     @Override
-    public ViewStats mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-        ViewStats viewStats = new ViewStats();
+    public EndpointStats mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+        EndpointStats viewStats = new EndpointStats();
         viewStats.setApp(resultSet.getString("app"));
         viewStats.setUri(resultSet.getString("uri"));
         viewStats.setHits(resultSet.getInt("hits"));

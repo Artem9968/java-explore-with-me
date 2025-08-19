@@ -1,11 +1,11 @@
-package ru.practicum.statsvc;
+package ru.practicum.statssvc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class StatSvcApp {
+public class StatsSvcApp {
     public static void main(String[] args) {
-        SpringApplication.run(StatSvcApp.class, args);
+        SpringApplication.run(StatsSvcApp.class, args);
     }
 }

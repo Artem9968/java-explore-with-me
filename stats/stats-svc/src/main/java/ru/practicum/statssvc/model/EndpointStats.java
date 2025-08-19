@@ -1,4 +1,4 @@
-package ru.practicum.statsvc.model;
+package ru.practicum.statssvc.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,13 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ViewStats {
-    String app;
-    String uri;
-    Integer hits;
+
+public class EndpointStats {
+
+    private String app;
+
+    private String uri;
+
+    private Integer hits;
+
 }

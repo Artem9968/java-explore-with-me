@@ -5,23 +5,31 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.practicum</groupId>
-        <artifactId>stats-server</artifactId>
+        <artifactId>explore-with-me</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>stat-dto</artifactId>
+    <artifactId>stats</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>stats-dto</module>
+        <module>stats-svc</module>
+        <module>stats-client</module>
+    </modules>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.9.0</version> <!-- Выберите версию, подходящую проекту -->
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
+
     </dependencies>
 
     <properties>

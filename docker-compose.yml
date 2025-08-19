@@ -1,14 +1,58 @@
+version: '3.1'
 services:
   stats-server:
+    build: stats-server
+    image: stats-server
+    container_name: stats-server
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=statdb
+      - SPRING_DATASOURCE_PASSWORD=statdb
 
   stats-db:
-    image: postgres:16.1
+    image: postgres:14-alpine
+    container_name: postgres-stat
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=statdb
+      - POSTGRES_USER=statdb
+      - POSTGRES_DB=statdb
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   ewm-service:
+    build: ewm-service
+    image: ewm-service
+    container_name: ewm-service
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewmdb
+      - SPRING_DATASOURCE_USERNAME=ewmdb
+      - SPRING_DATASOURCE_PASSWORD=ewmdb
+      - STATSERVER_URL=http://stats-server:9090
 
   ewm-db:
-    image: postgres:16.1
+    image: postgres:14-alpine
+    container_name: postgres-ewm
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_PASSWORD=ewmdb
+      - POSTGRES_USER=ewmdb
+      - POSTGRES_DB=ewmdb
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10

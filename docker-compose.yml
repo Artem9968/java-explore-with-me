@@ -1,6 +1,7 @@
+version: '3.8'
 services:
   stats-server:
-    build: ./stats/stats-svc  
+    build: ./stats
     image: stats-server
     container_name: stats-server
     ports:

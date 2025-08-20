@@ -47,15 +47,13 @@
         <dependency>
             <groupId>ru.practicum</groupId>
             <artifactId>stats-dto</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.practicum</groupId>
             <artifactId>stats-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

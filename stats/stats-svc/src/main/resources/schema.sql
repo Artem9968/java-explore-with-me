@@ -5,5 +5,3 @@ CREATE TABLE IF NOT EXISTS endpoint_requests (
     ip VARCHAR(45) NOT NULL,
     timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-
-ALTER SEQUENCE endpoint_requests_id_seq RESTART WITH 1;

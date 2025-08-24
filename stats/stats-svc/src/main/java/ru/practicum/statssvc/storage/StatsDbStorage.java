@@ -21,7 +21,7 @@ public class StatsDbStorage implements StatsStorage {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String INSERT_HIT_SQL = """
             INSERT INTO endpoint_requests (app, uri, ip, timestamp)
-            VALUES ( :app, :uri, :ip, :timestamp)
+            VALUES (:app, :uri, :ip, :timestamp)
             """;
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -40,68 +40,78 @@ public class StatsDbStorage implements StatsStorage {
                             .addValue("uri", hit.getUri())
                             .addValue("ip", hit.getIp())
                             .addValue("timestamp", hit.getTimestamp().format(DATE_TIME_FORMATTER), Types.TIMESTAMP),
-                    generatedKeyHolder, new String[]{"id"}
-            );
+                    generatedKeyHolder, new String[]{"id"});
         } catch (DataAccessException e) {
             throw new InternalServerException("Database save error: " + e.getMessage());
         }
 
-        final Integer hitId = generatedKeyHolder.getKey().intValue();
-        hit.setId(hitId);
+        hit.setId(generatedKeyHolder.getKey().intValue());
     }
 
     @Override
     public List<EndpointStats> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique, Integer limit) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT app, uri, count(ip) as hits FROM ");
-
-        if (unique) {
-            sql.append("(SELECT DISTINCT ON (ip) app, uri, ip, timestamp FROM endpoint_requests) AS unique_hits");
-
-        } else {
-            sql.append("endpoint_requests");
-        }
-
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-        Boolean hasWhereClause = false;
+        StringBuilder sql = new StringBuilder();
 
-        if (uris != null && !uris.isEmpty()) {
-            sql.append(" WHERE uri IN (:uris)");
-            parameters.addValue("uris", uris);
-            hasWhereClause = true;
-        }
+        if (Boolean.TRUE.equals(unique)) {
+            sql.append("SELECT app, uri, COUNT(*) AS hits FROM (")
+                    .append("  SELECT DISTINCT ON (app, uri, ip) app, uri, ip ")
+                    .append("  FROM endpoint_requests ");
 
-        if (start != null) {
-            if (hasWhereClause) {
-                sql.append(" AND timestamp >= :start");
-            } else {
-                sql.append(" WHERE timestamp >= :start");
-                hasWhereClause = true;
+            boolean hasWhere = false;
+            if (uris != null && !uris.isEmpty()) {
+                sql.append("WHERE uri IN (:uris) ");
+                parameters.addValue("uris", uris);
+                hasWhere = true;
             }
-            parameters.addValue("start", start);
-        }
 
-        if (end != null) {
-            if (hasWhereClause) {
-                sql.append(" AND timestamp < :end");
-            } else {
-                sql.append(" WHERE timestamp < :end");
+            if (start != null) {
+                sql.append(hasWhere ? "AND " : "WHERE ").append("timestamp >= :start ");
+                parameters.addValue("start", start);
+                hasWhere = true;
             }
-            parameters.addValue("end", end);
-        }
 
-        sql.append(" GROUP BY uri, app ORDER BY hits DESC");
+            if (end != null) {
+                sql.append(hasWhere ? "AND " : "WHERE ").append("timestamp < :end ");
+                parameters.addValue("end", end);
+            }
+
+            sql.append("  ORDER BY app, uri, ip, timestamp")
+                    .append(") AS unique_hits ");
+            sql.append("GROUP BY app, uri ");
+            sql.append("ORDER BY hits DESC ");
+        } else {
+            sql.append("SELECT app, uri, COUNT(ip) AS hits FROM endpoint_requests ");
+
+            boolean hasWhere = false;
+            if (uris != null && !uris.isEmpty()) {
+                sql.append("WHERE uri IN (:uris) ");
+                parameters.addValue("uris", uris);
+                hasWhere = true;
+            }
+
+            if (start != null) {
+                sql.append(hasWhere ? "AND " : "WHERE ").append("timestamp >= :start ");
+                parameters.addValue("start", start);
+                hasWhere = true;
+            }
+
+            if (end != null) {
+                sql.append(hasWhere ? "AND " : "WHERE ").append("timestamp < :end ");
+                parameters.addValue("end", end);
+            }
+
+            sql.append("GROUP BY app, uri ");
+            sql.append("ORDER BY hits DESC ");
+        }
 
         if (limit != null) {
-            parameters.addValue("limit", limit);  // Теперь :limit вместо :size
-            sql.append(" LIMIT :limit");
+            sql.append("LIMIT :limit");
+            parameters.addValue("limit", limit);
         }
 
         try {
-            List<EndpointStats> stats = jdbc.query(sql.toString(),
-                    parameters,
-                    new ViewStatsResultSetMapper());
-            return stats;
+            return jdbc.query(sql.toString(), parameters, new ViewStatsResultSetMapper());
         } catch (EmptyResultDataAccessException ignored) {
             return List.of();
         }

@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.mainservice.model.Location;
+import ru.practicum.mainservice.model.Coordinates;
 
 import java.time.LocalDateTime;
 
@@ -34,7 +34,7 @@ public class NewEventDto {
     @Future(message = "дата события не должна быть уже наступившей.")
     private LocalDateTime eventDate;
     @NotNull(message = "Место события должно быть определено.")
-    private Location location;
+    private Coordinates coordinates;
     private Boolean paid;
     @PositiveOrZero
     private Integer participantLimit;

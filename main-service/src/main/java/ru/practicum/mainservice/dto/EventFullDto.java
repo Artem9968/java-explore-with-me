@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.mainservice.enums.EventState;
-import ru.practicum.mainservice.model.Location;
+import ru.practicum.mainservice.model.enums.EventStatus;
+import ru.practicum.mainservice.model.Coordinates;
 
 import java.time.LocalDateTime;
 
@@ -24,13 +24,13 @@ public class EventFullDto {
     private LocalDateTime eventDate;
     private Integer id;
     private UserShortDto initiator;
-    private Location location;
+    private Coordinates coordinates;
     private Boolean paid;
     private Integer participantLimit;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
-    private EventState state;
+    private EventStatus state;
     @Size(min = 3, max = 120, message = "длина заголовка 3 - 120 символов.")
     private String title;
     private Integer views;

@@ -8,7 +8,7 @@ import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.PatchCompilationDto;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CompilationMapper;
-import ru.practicum.mainservice.model.Compilation;
+import ru.practicum.mainservice.model.EventCollection;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
 
@@ -24,59 +24,59 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto compilationDto) {
-        Compilation compilation = CompilationMapper.toCompilation(compilationDto);
+        EventCollection eventCollection = CompilationMapper.toCompilation(compilationDto);
         List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
-        compilation.setEvents(new HashSet<>(events));
-        Compilation savedCompilation = compilationRepository.save(compilation);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedCompilation);
+        eventCollection.setEvents(new HashSet<>(events));
+        EventCollection savedEventCollection = compilationRepository.save(eventCollection);
+        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedEventCollection);
         return savedCompilationDto;
     }
 
     @Override
     public CompilationDto patchCompilation(Integer compId, PatchCompilationDto compilationDto) {
-        Compilation compilation = compilationRepository.findById(compId)
+        EventCollection eventCollection = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
         if (compilationDto.getTitle() != null) {
-            compilation.setTitle(compilationDto.getTitle());
+            eventCollection.setCollectionTitle(compilationDto.getTitle());
         }
         if (compilationDto.getPinned() != null) {
-            compilation.setPinned(compilationDto.getPinned());
+            eventCollection.setIsPinned(compilationDto.getPinned());
         }
         if (compilationDto.getEvents() != null) {
             if (!compilationDto.getEvents().isEmpty()) {
                 List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
-                compilation.setEvents(new HashSet<>(events));
+                eventCollection.setEvents(new HashSet<>(events));
             }
         }
-        Compilation savedCompilation = compilationRepository.save(compilation);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedCompilation);
+        EventCollection savedEventCollection = compilationRepository.save(eventCollection);
+        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedEventCollection);
         return savedCompilationDto;
     }
 
     @Override
     public void deleteCompilation(Integer compId) {
-        Compilation compilation = compilationRepository.findById(compId)
+        EventCollection eventCollection = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        compilation.getEvents().clear();
-        compilationRepository.delete(compilation);
+        eventCollection.getEvents().clear();
+        compilationRepository.delete(eventCollection);
     }
 
     @Override
     public CompilationDto getCompilation(Integer compId) {
-        Compilation compilation = compilationRepository.findById(compId)
+        EventCollection eventCollection = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        return CompilationMapper.toCompilationDto(compilation);
+        return CompilationMapper.toCompilationDto(eventCollection);
     }
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
-        List<Compilation> compilations;
+        List<EventCollection> eventCollections;
         if (pinned != null) {
-            compilations = compilationRepository.findAllByPinnedEquals(pinned);
+            eventCollections = compilationRepository.findAllByPinnedEquals(pinned);
         } else {
-            compilations = compilationRepository.findAll();
+            eventCollections = compilationRepository.findAll();
         }
-        return compilations.stream()
+        return eventCollections.stream()
                 .map(CompilationMapper::toCompilationDto)
                 .skip(from)
                 .limit(size)

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.mainservice.enums.RequestStatus;
+import ru.practicum.mainservice.model.enums.RequestState;
 
 import java.time.LocalDateTime;
 
@@ -21,5 +21,5 @@ public class RequestDto {
     private LocalDateTime created;
     private Integer event;
     private Integer requester;
-    private RequestStatus status;
+    private RequestState status;
 }

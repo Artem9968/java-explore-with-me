@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.mainservice.enums.EventUserAction;
-import ru.practicum.mainservice.model.Location;
+import ru.practicum.mainservice.model.enums.UserEventAction;
+import ru.practicum.mainservice.model.Coordinates;
 
 import java.time.LocalDateTime;
 
@@ -26,12 +26,12 @@ public class UpdateEventUserRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(message = "дата события не должна быть уже наступившей.")
     private LocalDateTime eventDate;
-    private Location location;
+    private Coordinates coordinates;
     private Boolean paid;
     @Positive(message = "число участников должно быть положительным")
     private Integer participantLimit;
     private Boolean requestModeration;
     @Size(min = 3, max = 120, message = "длина заголовка 3 - 120 символов.")
     private String title;
-    private EventUserAction stateAction;
+    private UserEventAction stateAction;
 }

@@ -1,55 +1,81 @@
 package ru.practicum.mainservice.model;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.mainservice.enums.EventState;
-
+import ru.practicum.mainservice.model.enums.EventStatus;
+import jakarta.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
-@Getter
 @Table(name = "events", schema = "public")
+@Getter
+@Setter
 @NoArgsConstructor
 public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name = "annotation", nullable = false)
+
+    @Column(nullable = false, name = "annotation")
     private String annotation;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-    @Column(name = "createdon", nullable = false)
-    private LocalDateTime createdOn;
-    @Column(name = "description")
-    private String description;
-    @Column(name = "eventdate", nullable = false)
-    private LocalDateTime eventDate;
-    @ManyToOne
-    @JoinColumn(name = "initiator_id")
-    private User initiator;
-    @Column(name = "lat")
-    private Float lat;
-    @Column(name = "lon")
-    private Float lon;
-    @Column(name = "paid")
-    private Boolean paid;
-    @Column(name = "participantlimit")
-    private Integer participantLimit;
-    @Column(name = "publishedon")
-    private LocalDateTime publishedOn;
-    @Column(name = "requestmoderation")
-    private Boolean requestModeration;
-    @Column(name = "state")
+
     @Enumerated(EnumType.STRING)
-    private EventState state;
+    @Column(name = "state")
+    private EventStatus state;
+
     @Column(name = "title")
     private String title;
+
+    @Column(name = "description")
+    private String description;
+
+    @JoinColumn(name = "category_id")
+    @ManyToOne
+    private Category category;
+
+    @Column(nullable = false, name = "createdon")
+    private LocalDateTime creationTimestamp;
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Integer id;
+
+    @Column(name = "participantlimit")
+    private Integer maxAttendees;
+
+    @Column(name = "publishedon")
+    private LocalDateTime publicationTime;
+
     @Transient
-    private Integer confirmedRequests;
+    private Integer viewCount;
+
+    @Column(name = "requestmoderation")
+    private Boolean requiresApproval;
+
+    @Column(nullable = false, name = "eventdate")
+    private LocalDateTime scheduledTime;
+
+    @JoinColumn(name = "initiator_id")
+    @ManyToOne
+    private User organizer;
+
+    @Column(name = "lat")
+    private Float latitude;
+
+    @Column(name = "lon")
+    private Float longitude;
+
+    @Column(name = "paid")
+    private Boolean isPaid;
+
     @Transient
-    private Integer views;
+    private Integer approvedParticipants;
 }

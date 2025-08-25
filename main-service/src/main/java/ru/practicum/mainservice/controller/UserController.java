@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.mapper.RequestMapper;
-import ru.practicum.mainservice.model.Request;
+import ru.practicum.mainservice.model.EventRequest;
 import ru.practicum.mainservice.service.EventService;
 import ru.practicum.mainservice.service.RequestService;
 
@@ -93,8 +93,8 @@ public class UserController {
                                     @RequestParam(name = "eventId") Integer eventId) {
         log.info("Пользователь id={} создает запрос на участие в событии id={}.",
                 userId, eventId);
-        Request request = requestService.createRequest(userId, eventId);
-        return RequestMapper.toRequestDto(request);
+        EventRequest eventRequest = requestService.createRequest(userId, eventId);
+        return RequestMapper.toRequestDto(eventRequest);
     }
 
     @GetMapping("/{userId}/requests")

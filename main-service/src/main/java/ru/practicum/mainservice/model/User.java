@@ -1,26 +1,31 @@
 package ru.practicum.mainservice.model;
 
-import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import jakarta.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
-/**
- * Класс описания пользователя
- */
 @Entity
-@Setter
-@Getter
 @Table(name = "users", schema = "public")
-@EqualsAndHashCode(of = {"name", "email"})
+@Getter
+@Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"name", "emailAddress"})
 public class User {
-    @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Integer id;
-    @Column(name = "name", nullable = false)
+
+    @Column(nullable = false, name = "email")
+    private String emailAddress;
+
+    @Column(nullable = false, name = "name")
     private String name;
-    @Column(name = "email", nullable = false)
-    private String email;
 }

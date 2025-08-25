@@ -15,7 +15,7 @@ import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.enums.EventState;
+import ru.practicum.mainservice.model.enums.EventStatus;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CategoryMapper;
 import ru.practicum.mainservice.mapper.EventMapper;
@@ -58,16 +58,16 @@ public class PublicController {
         log.info("🔍🔍🔍 Вызываем eventService.findEventById(id={})", id);
         Event event = eventService.findEventById(id);
         log.info("📊📊📊 После загрузки из eventService: eventId={}, title='{}', state={}, views={}",
-                event.getId(), event.getTitle(), event.getState(), event.getViews());
+                event.getId(), event.getTitle(), event.getState(), event.getViewCount());
 
         // 3. Проверка статуса
-        if (!event.getState().equals(EventState.PUBLISHED)) {
+        if (!event.getState().equals(EventStatus.ACTIVE)) {
             log.error("❌❌❌ Event не опубликован! id={}, state={}", event.getId(), event.getState());
             throw new NotFoundException("Среди опубликованных не найдено событие id=" + id);
         }
 
         // 4. Перед возвратом клиенту
-        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViews());
+        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViewCount());
         EventFullDto dto = EventMapper.toFullDto(event);
         log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViews());
 

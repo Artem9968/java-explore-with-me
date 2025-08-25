@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.mainservice.enums.RequestStatus;
+import ru.practicum.mainservice.model.enums.RequestState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,5 +15,5 @@ import java.util.List;
 @ToString
 public class RequestUpdateDto {
     List<Integer> requestIds = new ArrayList<>();
-    RequestStatus status;
+    RequestState status;
 }

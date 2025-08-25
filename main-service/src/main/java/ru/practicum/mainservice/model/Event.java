@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.mainsevice.enums.EventState;
+import ru.practicum.mainservice.enums.EventState;
 
 import java.time.LocalDateTime;
 

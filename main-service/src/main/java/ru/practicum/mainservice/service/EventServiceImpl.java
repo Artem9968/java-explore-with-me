@@ -27,6 +27,7 @@ import ru.practicum.mainservice.model.EventConfirmedRequestCount;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.EventSpecification;
+import ru.practicum.mainservice.repository.RequestRepository;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.StatsDto;
 

@@ -5,8 +5,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.mainsevice.enums.EventState;
-import ru.practicum.mainsevice.model.Location;
+import ru.practicum.mainservice.enums.EventState;
+import ru.practicum.mainservice.model.Location;
+
 
 import java.time.LocalDateTime;
 

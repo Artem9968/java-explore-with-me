@@ -1,4 +1,4 @@
-package ru.practicum.mainsevice.controller;
+package ru.practicum.mainservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainsevice.dto.CategoryDto;
-import ru.practicum.mainsevice.dto.NewCategoryDto;
-import ru.practicum.mainsevice.service.CategoryService;
+import ru.practicum.mainservice.dto.CategoryDto;
+import ru.practicum.mainservice.dto.NewCategoryDto;
+import ru.practicum.mainservice.service.CategoryService;
+
 
 @Slf4j
 @RequiredArgsConstructor

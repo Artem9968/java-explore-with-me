@@ -1,7 +1,5 @@
 package ru.practicum.mainservice.service;
 
-
-
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
 import ru.practicum.mainservice.dto.NewEventDto;

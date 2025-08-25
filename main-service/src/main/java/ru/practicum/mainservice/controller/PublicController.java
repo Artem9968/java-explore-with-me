@@ -14,17 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.CompilationDto;
+
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
 
+import ru.practicum.mainservice.enums.EventState;
 import ru.practicum.mainservice.exception.NotFoundException;
+import ru.practicum.mainservice.mapper.CategoryMapper;
+import ru.practicum.mainservice.mapper.EventMapper;
 import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainsevice.mapper.CategoryMapper;
-import ru.practicum.mainsevice.mapper.EventMapper;
 
-import ru.practicum.mainsevice.service.CategoryService;
-import ru.practicum.mainsevice.service.CompilationService;
-import ru.practicum.mainsevice.service.EventService;
+import ru.practicum.mainservice.service.CategoryService;
+import ru.practicum.mainservice.service.CompilationService;
+import ru.practicum.mainservice.service.EventService;
 import ru.practicum.statsclient.StatsClient;
 
 import java.util.List;
@@ -45,16 +47,37 @@ public class PublicController {
     @GetMapping("/events/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto findEventById(@PathVariable("id") int id, HttpServletRequest request) {
-        log.info("Пользователь запрашивает для просмотра событие: {}", id);
-        Event event = eventService.findEventById(id);
+        log.info("🎯🎯🎯 [START] PublicController.findEventById id={}", id);
 
+        String ip = request.getRemoteAddr();
+        String uri = request.getRequestURI();
+        log.info("🌐🌐🌐 Клиентский запрос: IP={}, URI={}", ip, uri);
+
+        // 1. Логируем отправку хита
+        log.info("📤📤📤 Отправляем hit -> statsClient.hitInfo(appName={}, uri={}, ip={})", appName, uri, ip);
+        statsClient.hitInfo(appName, uri, ip);
+        log.info("✅✅✅ Hit отправлен в stats-service");
+
+        // 2. Получаем событие из сервиса
+        log.info("🔍🔍🔍 Вызываем eventService.findEventById(id={})", id);
+        Event event = eventService.findEventById(id);
+        log.info("📊📊📊 После загрузки из eventService: eventId={}, title='{}', state={}, views={}",
+                event.getId(), event.getTitle(), event.getState(), event.getViews());
+
+        // 3. Проверка статуса
         if (!event.getState().equals(EventState.PUBLISHED)) {
+            log.error("❌❌❌ Event не опубликован! id={}, state={}", event.getId(), event.getState());
             throw new NotFoundException("Среди опубликованных не найдено событие id=" + id);
         }
 
-        statsClient.hitInfo(appName, request.getRequestURI(), request.getRemoteAddr());
-        return EventMapper.toFullDto(event);
+        // 4. Перед возвратом клиенту
+        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViews());
+        EventFullDto dto = EventMapper.toFullDto(event);
+        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViews());
+
+        return dto;
     }
+
 
     @GetMapping("/events")
     @ResponseStatus(HttpStatus.OK)

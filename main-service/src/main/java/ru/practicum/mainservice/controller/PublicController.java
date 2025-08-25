@@ -11,19 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.CompilationDto;
-
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-
 import ru.practicum.mainservice.enums.EventState;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CategoryMapper;
 import ru.practicum.mainservice.mapper.EventMapper;
 import ru.practicum.mainservice.model.Event;
-
 import ru.practicum.mainservice.service.CategoryService;
 import ru.practicum.mainservice.service.CompilationService;
 import ru.practicum.mainservice.service.EventService;

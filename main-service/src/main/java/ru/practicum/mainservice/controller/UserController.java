@@ -13,19 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewEventDto;
-import ru.practicum.mainservice.dto.RequestDto;
-import ru.practicum.mainservice.dto.RequestGroupDto;
-import ru.practicum.mainservice.dto.RequestUpdateDto;
-import ru.practicum.mainservice.dto.UpdateEventUserRequest;
+import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.mapper.RequestMapper;
 import ru.practicum.mainservice.model.Request;
 import ru.practicum.mainservice.service.EventService;
 import ru.practicum.mainservice.service.RequestService;
-
 
 import java.util.List;
 

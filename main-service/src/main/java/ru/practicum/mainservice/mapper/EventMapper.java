@@ -7,7 +7,6 @@ import ru.practicum.mainservice.enums.EventState;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.Location;
 
-
 import java.time.LocalDateTime;
 
 public class EventMapper {

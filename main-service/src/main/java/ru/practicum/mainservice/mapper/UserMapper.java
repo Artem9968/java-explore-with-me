@@ -1,6 +1,5 @@
 package ru.practicum.mainservice.mapper;
 
-
 import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.UserShortDto;
 import ru.practicum.mainservice.model.User;

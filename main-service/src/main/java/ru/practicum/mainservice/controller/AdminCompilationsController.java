@@ -17,7 +17,6 @@ import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.PatchCompilationDto;
 import ru.practicum.mainservice.service.CompilationService;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController

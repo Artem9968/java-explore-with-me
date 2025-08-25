@@ -54,7 +54,7 @@ public class TestClientController {
 
         ResponseEntity<Object> response = statsClient.get(parameters);
 
-
+        // ФИКС: Правильная обработка ответа
         if (response == null) {
             log.warn("Stats client returned null response");
             return "[]";
@@ -67,7 +67,7 @@ public class TestClientController {
         }
 
         try {
-
+            // Преобразуем ответ в правильный JSON
             if (responseBody instanceof String) {
                 // Если это уже строка, проверяем что это валидный JSON
                 String bodyString = (String) responseBody;
@@ -76,7 +76,7 @@ public class TestClientController {
                 }
                 return bodyString;
             } else {
-
+                // Если это объект, сериализуем в JSON
                 return objectMapper.writeValueAsString(responseBody);
             }
         } catch (JsonProcessingException e) {

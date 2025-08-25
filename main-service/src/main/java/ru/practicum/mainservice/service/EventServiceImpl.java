@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewEventDto;
-import ru.practicum.mainservice.dto.UpdateEventAdminRequest;
-import ru.practicum.mainservice.dto.UpdateEventUserRequest;
+import ru.practicum.mainservice.dto.*;
 import ru.practicum.mainservice.enums.EventAdminAction;
 import ru.practicum.mainservice.enums.EventState;
 import ru.practicum.mainservice.enums.EventUserAction;
@@ -30,6 +26,7 @@ import ru.practicum.mainservice.repository.EventSpecification;
 import ru.practicum.mainservice.repository.RequestRepository;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.StatsDto;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

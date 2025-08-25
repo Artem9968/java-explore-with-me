@@ -10,17 +10,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.mainservice.dto.ApiError;
-import ru.practicum.mainservice.exception.BadRequestException;
-import ru.practicum.mainservice.exception.DataConflictException;
-import ru.practicum.mainservice.exception.InternalServerException;
-import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.exception.ValidationException;
-
+import ru.practicum.mainservice.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
+/**
+ * Класс обработки исключений при обработке поступивших http запросов
+ */
 @Slf4j
 @RestControllerAdvice
 public class ErrorAdvisor {

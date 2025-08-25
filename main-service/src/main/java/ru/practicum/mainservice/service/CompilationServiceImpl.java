@@ -12,7 +12,6 @@ import ru.practicum.mainservice.model.Compilation;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
 
-
 import java.util.HashSet;
 import java.util.List;
 

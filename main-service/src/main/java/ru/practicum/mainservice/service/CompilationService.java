@@ -1,6 +1,5 @@
 package ru.practicum.mainservice.service;
 
-
 import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.PatchCompilationDto;

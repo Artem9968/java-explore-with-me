@@ -3,7 +3,6 @@ package ru.practicum.mainservice.repository;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.mainservice.model.Event;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 

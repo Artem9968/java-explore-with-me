@@ -16,7 +16,6 @@ import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.service.CategoryService;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController

@@ -1,7 +1,5 @@
 package ru.practicum.mainservice.service;
 
-
-
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.model.Category;

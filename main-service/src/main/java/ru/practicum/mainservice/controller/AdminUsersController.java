@@ -18,7 +18,6 @@ import ru.practicum.mainservice.mapper.UserMapper;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.service.UserService;
 
-
 import java.util.List;
 
 @Slf4j

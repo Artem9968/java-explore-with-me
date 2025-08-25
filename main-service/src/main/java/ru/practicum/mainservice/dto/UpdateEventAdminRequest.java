@@ -11,7 +11,6 @@ import lombok.ToString;
 import ru.practicum.mainservice.enums.EventAdminAction;
 import ru.practicum.mainservice.model.Location;
 
-
 import java.time.LocalDateTime;
 
 @Setter

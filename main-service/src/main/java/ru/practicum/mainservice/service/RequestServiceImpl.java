@@ -17,7 +17,6 @@ import ru.practicum.mainservice.model.Request;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.RequestRepository;
 
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +94,10 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.save(request);
     }
 
-       @Override
+    /**
+     * Метод изменения поиска запросов к событию
+     */
+    @Override
     public List<Request> getRequestsByEventId(Integer userId, Integer eventId) {
         Event event = eventService.findEventById(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
@@ -108,6 +110,9 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findAllByEvent_Id(eventId);
     }
 
+    /**
+     * Метод изменения статуса запросов
+     */
     @Override
     public RequestGroupDto updateRequestsStatus(Integer userId, Integer eventId, RequestUpdateDto requestUpdateDto) {
         Event event = eventService.findEventById(eventId);
@@ -119,7 +124,9 @@ public class RequestServiceImpl implements RequestService {
             );
         }
 
-               Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
+        // ...нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
+        // (Ожидается код ошибки 409)
+        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
         if ((event.getParticipantLimit() > 0)
                 && event.getParticipantLimit().equals(confirmedRequests)) {
             throw new DataConflictException(
@@ -137,10 +144,12 @@ public class RequestServiceImpl implements RequestService {
         Collections.sort(requestIds);
         RequestStatus status = requestUpdateDto.getStatus();
 
+        // Проверяем заявки из списка
         for (Integer requestId : requestIds) {
             Request request = requestRepository.findById(requestId)
                     .orElseThrow(() -> new NotFoundException("Не найдена заявка id=" + requestId));
-
+            // ... статус можно изменить только у заявок, находящихся в состоянии ожидания
+            // (Ожидается код ошибки 409)
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new DataConflictException(
                         "Field: request.status. " +
@@ -148,7 +157,8 @@ public class RequestServiceImpl implements RequestService {
                                 ". Value: " + request.getStatus()
                 );
             }
-
+            // ... если при подтверждении данной заявки, лимит заявок для события исчерпан,
+            // то все неподтверждённые заявки необходимо отклонить
             if (confirmedRequests.equals(event.getParticipantLimit())) {
                 status = RequestStatus.REJECTED;
             }

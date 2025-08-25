@@ -6,15 +6,15 @@ import ru.practicum.mainservice.model.Event;
 import java.util.List;
 
 public interface EventService {
-    EventFullDto createEvent(NewEventDto newEventDto, Integer userId);
+    EventFullDto createEvent(EventCreateRequest eventCreateRequest, Integer userId);
 
     EventFullDto getEventById(Integer eventId, Integer userId);
 
     List<EventShortDto> getEventsByUserId(Integer userId, Integer from, Integer size);
 
-    EventFullDto patchEvent(Integer eventId, UpdateEventUserRequest eventDto, Integer userId);
+    EventFullDto patchEvent(Integer eventId, EventUserUpdateRequest eventDto, Integer userId);
 
-    EventFullDto adminUpdateEvent(Integer eventId, UpdateEventAdminRequest eventDto);
+    EventFullDto adminUpdateEvent(Integer eventId, EventAdminUpdateRequest eventDto);
 
     Event findEventById(Integer eventId);
 

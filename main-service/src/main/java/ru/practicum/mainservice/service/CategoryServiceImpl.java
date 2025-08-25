@@ -3,8 +3,8 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mainservice.dto.CategoryDto;
-import ru.practicum.mainservice.dto.NewCategoryDto;
+import ru.practicum.mainservice.dto.CategoryResponse;
+import ru.practicum.mainservice.dto.CategoryCreateRequest;
 import ru.practicum.mainservice.exception.DataConflictException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CategoryMapper;
@@ -24,17 +24,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto createCategory(NewCategoryDto categoryDto) {
+    public CategoryResponse createCategory(CategoryCreateRequest categoryDto) {
         Category savedCategory = categoryRepository.save(CategoryMapper.toCategory(categoryDto));
         return CategoryMapper.toDto(savedCategory);
     }
 
     @Override
     @Transactional
-    public CategoryDto updateCategory(Integer id, NewCategoryDto categoryDto) {
+    public CategoryResponse updateCategory(Integer id, CategoryCreateRequest categoryDto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
-        category.setName(categoryDto.getName());
+        category.setName(categoryDto.getCategoryName());
         Category updatedCategory = categoryRepository.save(category);
         return CategoryMapper.toDto(updatedCategory);
     }

@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
+import ru.practicum.mainservice.dto.EventCollectionResponse;
+import ru.practicum.mainservice.dto.EventCollectionCreateRequest;
+import ru.practicum.mainservice.dto.EventCollectionUpdateRequest;
 import ru.practicum.mainservice.service.CompilationService;
 
 @Slf4j
@@ -26,16 +26,16 @@ public class AdminCompilationsController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto createCompilation(@Validated @RequestBody NewCompilationDto newCompilationDto) {
-        log.info("Администратор создает подборку событий '{}'.", newCompilationDto.getTitle());
-        return compilationService.createCompilation(newCompilationDto);
+    public EventCollectionResponse createCompilation(@Validated @RequestBody EventCollectionCreateRequest eventCollectionCreateRequest) {
+        log.info("Администратор создает подборку событий '{}'.", eventCollectionCreateRequest.getCollectionTitle());
+        return compilationService.createCompilation(eventCollectionCreateRequest);
     }
 
     @PatchMapping("/{compId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompilationDto updateCompilation(@PathVariable Integer compId,
-                                            @Validated @RequestBody PatchCompilationDto compilationDto) {
-        log.info("Администратор обновляет подборку событий '{}'.", compilationDto.getTitle());
+    public EventCollectionResponse updateCompilation(@PathVariable Integer compId,
+                                                     @Validated @RequestBody EventCollectionUpdateRequest compilationDto) {
+        log.info("Администратор обновляет подборку событий '{}'.", compilationDto.getCollectionTitle());
         return compilationService.patchCompilation(compId, compilationDto);
     }
 

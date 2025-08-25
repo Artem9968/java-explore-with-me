@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
+import ru.practicum.mainservice.model.enums.RequestState;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 @Setter
 @ToString
 @NoArgsConstructor
-public class RequestGroupDto {
+public class RequestStatusUpdate {
 
-    private List<ParticipationRequestResponse> declinedRequests = new ArrayList<>();
+    private RequestState newStatus;
 
-    private List<ParticipationRequestResponse> approvedRequests = new ArrayList<>();
+    private List<Integer> requestIds = new ArrayList<>();
 }

@@ -3,9 +3,9 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mainservice.dto.RequestDto;
+import ru.practicum.mainservice.dto.ParticipationRequestResponse;
 import ru.practicum.mainservice.dto.RequestGroupDto;
-import ru.practicum.mainservice.dto.RequestUpdateDto;
+import ru.practicum.mainservice.dto.RequestStatusUpdate;
 import ru.practicum.mainservice.model.enums.EventStatus;
 import ru.practicum.mainservice.model.enums.RequestState;
 import ru.practicum.mainservice.exception.DataConflictException;
@@ -70,7 +70,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RequestDto> getRequestsByUserId(Integer userId) {
+    public List<ParticipationRequestResponse> getRequestsByUserId(Integer userId) {
         List<EventRequest> eventRequests = requestRepository.findAllByRequester_Id(userId);
         if (eventRequests.isEmpty()) {
             return List.of();
@@ -114,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
      * Метод изменения статуса запросов
      */
     @Override
-    public RequestGroupDto updateRequestsStatus(Integer userId, Integer eventId, RequestUpdateDto requestUpdateDto) {
+    public RequestGroupDto updateRequestsStatus(Integer userId, Integer eventId, RequestStatusUpdate requestStatusUpdate) {
         Event event = eventService.findEventById(eventId);
         if (!event.getOrganizer().getId().equals(userId)) {
             throw new ValidationException(
@@ -137,12 +137,12 @@ public class RequestServiceImpl implements RequestService {
         }
 
         RequestGroupDto requestGroupDto = new RequestGroupDto();
-        List<Integer> requestIds = requestUpdateDto.getRequestIds();
+        List<Integer> requestIds = requestStatusUpdate.getRequestIds();
         if (requestIds.isEmpty()) {
             return requestGroupDto;
         }
         Collections.sort(requestIds);
-        RequestState status = requestUpdateDto.getStatus();
+        RequestState status = requestStatusUpdate.getNewStatus();
 
         // Проверяем заявки из списка
         for (Integer requestId : requestIds) {
@@ -165,10 +165,10 @@ public class RequestServiceImpl implements RequestService {
             eventRequest.setRequestState(status);
             EventRequest savedEventRequest = requestRepository.save(eventRequest);
             if (savedEventRequest.getRequestState().equals(RequestState.APPROVED)) {
-                requestGroupDto.getConfirmedRequests().add(RequestMapper.toRequestDto(savedEventRequest));
+                requestGroupDto.getApprovedRequests().add(RequestMapper.toRequestDto(savedEventRequest));
                 confirmedRequests++;
             } else if (savedEventRequest.getRequestState().equals(RequestState.DECLINED)) {
-                requestGroupDto.getRejectedRequests().add(RequestMapper.toRequestDto(savedEventRequest));
+                requestGroupDto.getDeclinedRequests().add(RequestMapper.toRequestDto(savedEventRequest));
             }
         }
         return requestGroupDto;

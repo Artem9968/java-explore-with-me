@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/{id}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable int id,
-                                    @Validated @RequestBody NewEventDto eventDto) {
+                                    @Validated @RequestBody EventCreateRequest eventDto) {
         log.info("Пользователь id={} cоздает новое событие: {}", id, eventDto.toString());
         return eventService.createEvent(eventDto, id);
     }
@@ -60,15 +60,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable Integer userId,
                                     @PathVariable Integer eventId,
-                                    @Validated @RequestBody UpdateEventUserRequest eventDto) {
+                                    @Validated @RequestBody EventUserUpdateRequest eventDto) {
         log.info("Пользователь id={} изменяет информацию об инициированном событии. {}", userId, eventDto.toString());
         return eventService.patchEvent(eventId, eventDto, userId);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestDto> findRequestsByEventId(@PathVariable int userId,
-                                                  @PathVariable int eventId) {
+    public List<ParticipationRequestResponse> findRequestsByEventId(@PathVariable int userId,
+                                                                    @PathVariable int eventId) {
         log.info("Пользователь id={} выполняет поиск запросов на участие в событии id={}.",
                 userId, eventId);
         return requestService.getRequestsByEventId(userId, eventId)
@@ -81,16 +81,16 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public RequestGroupDto patchRequestsByEventId(@PathVariable int userId,
                                                   @PathVariable int eventId,
-                                                  @RequestBody RequestUpdateDto requestUpdateDto) {
+                                                  @RequestBody RequestStatusUpdate requestStatusUpdate) {
         log.info("Пользователь id={} модерирует запросы на событие id={}.",
                 userId, eventId);
-        return requestService.updateRequestsStatus(userId, eventId, requestUpdateDto);
+        return requestService.updateRequestsStatus(userId, eventId, requestStatusUpdate);
     }
 
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestDto createRequest(@PathVariable Integer userId,
-                                    @RequestParam(name = "eventId") Integer eventId) {
+    public ParticipationRequestResponse createRequest(@PathVariable Integer userId,
+                                                      @RequestParam(name = "eventId") Integer eventId) {
         log.info("Пользователь id={} создает запрос на участие в событии id={}.",
                 userId, eventId);
         EventRequest eventRequest = requestService.createRequest(userId, eventId);
@@ -99,15 +99,15 @@ public class UserController {
 
     @GetMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestDto> findRequestsByUserId(@PathVariable Integer userId) {
+    public List<ParticipationRequestResponse> findRequestsByUserId(@PathVariable Integer userId) {
         log.info("Пользователь id={} выполняет поиск собственных заявок.", userId);
         return requestService.getRequestsByUserId(userId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public RequestDto canceledRequestById(@PathVariable Integer userId,
-                                          @PathVariable Integer requestId) {
+    public ParticipationRequestResponse canceledRequestById(@PathVariable Integer userId,
+                                                            @PathVariable Integer requestId) {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
         return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
     }

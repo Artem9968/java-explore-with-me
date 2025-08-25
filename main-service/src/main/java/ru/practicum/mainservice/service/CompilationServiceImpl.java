@@ -3,9 +3,9 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
+import ru.practicum.mainservice.dto.EventCollectionResponse;
+import ru.practicum.mainservice.dto.EventCollectionCreateRequest;
+import ru.practicum.mainservice.dto.EventCollectionUpdateRequest;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CompilationMapper;
 import ru.practicum.mainservice.model.EventCollection;
@@ -23,34 +23,34 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventService eventService;
 
     @Override
-    public CompilationDto createCompilation(NewCompilationDto compilationDto) {
+    public EventCollectionResponse createCompilation(EventCollectionCreateRequest compilationDto) {
         EventCollection eventCollection = CompilationMapper.toCompilation(compilationDto);
-        List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
+        List<Event> events = eventService.findEventsByIdIn(compilationDto.getEventIds());
         eventCollection.setEvents(new HashSet<>(events));
         EventCollection savedEventCollection = compilationRepository.save(eventCollection);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedEventCollection);
-        return savedCompilationDto;
+        EventCollectionResponse savedEventCollectionResponse = CompilationMapper.toCompilationDto(savedEventCollection);
+        return savedEventCollectionResponse;
     }
 
     @Override
-    public CompilationDto patchCompilation(Integer compId, PatchCompilationDto compilationDto) {
+    public EventCollectionResponse patchCompilation(Integer compId, EventCollectionUpdateRequest compilationDto) {
         EventCollection eventCollection = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        if (compilationDto.getTitle() != null) {
-            eventCollection.setCollectionTitle(compilationDto.getTitle());
+        if (compilationDto.getCollectionTitle() != null) {
+            eventCollection.setCollectionTitle(compilationDto.getCollectionTitle());
         }
-        if (compilationDto.getPinned() != null) {
-            eventCollection.setIsPinned(compilationDto.getPinned());
+        if (compilationDto.getIsPinned() != null) {
+            eventCollection.setIsPinned(compilationDto.getIsPinned());
         }
-        if (compilationDto.getEvents() != null) {
-            if (!compilationDto.getEvents().isEmpty()) {
-                List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
+        if (compilationDto.getEventIds() != null) {
+            if (!compilationDto.getEventIds().isEmpty()) {
+                List<Event> events = eventService.findEventsByIdIn(compilationDto.getEventIds());
                 eventCollection.setEvents(new HashSet<>(events));
             }
         }
         EventCollection savedEventCollection = compilationRepository.save(eventCollection);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedEventCollection);
-        return savedCompilationDto;
+        EventCollectionResponse savedEventCollectionResponse = CompilationMapper.toCompilationDto(savedEventCollection);
+        return savedEventCollectionResponse;
     }
 
     @Override
@@ -62,14 +62,14 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto getCompilation(Integer compId) {
+    public EventCollectionResponse getCompilation(Integer compId) {
         EventCollection eventCollection = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
         return CompilationMapper.toCompilationDto(eventCollection);
     }
 
     @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+    public List<EventCollectionResponse> getCompilations(Boolean pinned, Integer from, Integer size) {
         List<EventCollection> eventCollections;
         if (pinned != null) {
             eventCollections = compilationRepository.findAllByPinnedEquals(pinned);

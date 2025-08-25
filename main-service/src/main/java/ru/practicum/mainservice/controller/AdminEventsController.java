@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.UpdateEventAdminRequest;
+import ru.practicum.mainservice.dto.EventAdminUpdateRequest;
 import ru.practicum.mainservice.service.EventService;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class AdminEventsController {
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable Integer eventId,
-                                    @RequestBody @Validated UpdateEventAdminRequest eventDto) {
+                                    @RequestBody @Validated EventAdminUpdateRequest eventDto) {
         log.info("Администратор редактирует событие id={}. {}", eventId, eventDto);
         return eventService.adminUpdateEvent(eventId, eventDto);
     }

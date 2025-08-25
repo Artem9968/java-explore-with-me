@@ -1,37 +1,52 @@
 package ru.practicum.mainservice.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.practicum.mainservice.model.enums.EventStatus;
 import ru.practicum.mainservice.model.Coordinates;
-
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 public class EventFullDto {
-    private String annotation;
-    private CategoryDto category;
-    private Integer confirmedRequests;
+
+    private Integer viewCount;
+
+    @Size(min = 3, max = 120, message = "Заголовок должен содержать от 3 до 120 символов")
+    private String title;
+
+    private EventStatus eventStatus;
+
+    private Boolean requiresApproval;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdOn;
-    private String description;
+    private LocalDateTime publicationTime;
+
+    private Integer maxAttendees;
+
+    private Boolean isPaid;
+
+    private Coordinates location;
+
+    private UserShortDto organizer;
+
+    private Integer id;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private Integer id;
-    private UserShortDto initiator;
-    private Coordinates coordinates;
-    private Boolean paid;
-    private Integer participantLimit;
+
+    private String description;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime publishedOn;
-    private Boolean requestModeration;
-    private EventStatus state;
-    @Size(min = 3, max = 120, message = "длина заголовка 3 - 120 символов.")
-    private String title;
-    private Integer views;
+    private LocalDateTime creationTimestamp;
+
+    private Integer approvedParticipantsCount;
+
+    private CategoryResponse category;
+
+    private String annotation;
 }

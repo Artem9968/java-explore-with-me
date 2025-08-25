@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.CategoryDto;
-import ru.practicum.mainservice.dto.CompilationDto;
+import ru.practicum.mainservice.dto.CategoryResponse;
+import ru.practicum.mainservice.dto.EventCollectionResponse;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
 import ru.practicum.mainservice.model.enums.EventStatus;
@@ -69,7 +69,7 @@ public class PublicController {
         // 4. Перед возвратом клиенту
         log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViewCount());
         EventFullDto dto = EventMapper.toFullDto(event);
-        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViews());
+        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViewCount());
 
         return dto;
     }
@@ -100,7 +100,7 @@ public class PublicController {
 
     @GetMapping("/compilations")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompilationDto> findAllCompilations(
+    public List<EventCollectionResponse> findAllCompilations(
             @RequestParam(name = "pinned", required = false) Boolean pinned,
             @RequestParam(name = "from", defaultValue = "0") Integer from,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
@@ -110,15 +110,15 @@ public class PublicController {
 
     @GetMapping("/compilations/{compId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompilationDto findCompilationById(@PathVariable("compId") int compId) {
+    public EventCollectionResponse findCompilationById(@PathVariable("compId") int compId) {
         log.info("Пользователь запрашивает подборку id={}.", compId);
         return compilationService.getCompilation(compId);
     }
 
     @GetMapping("/categories")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
-                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public List<CategoryResponse> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь запрашивает список категорий.");
         return categoryService.getAllCategories().stream()
                 .map(CategoryMapper::toDto)
@@ -128,7 +128,7 @@ public class PublicController {
 
     @GetMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
+    public CategoryResponse findCategoryById(@PathVariable("catId") int catId) {
         log.info("Пользователь запрашивает категорию id={}.", catId);
         return CategoryMapper.toDto(categoryService.getCategoryById(catId));
     }

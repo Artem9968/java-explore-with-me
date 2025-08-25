@@ -2,7 +2,7 @@ package ru.practicum.mainservice.mapper;
 
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewEventDto;
+import ru.practicum.mainservice.dto.EventCreateRequest;
 import ru.practicum.mainservice.model.enums.EventStatus;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.Coordinates;
@@ -13,25 +13,25 @@ public class EventMapper {
     private EventMapper() {
     }
 
-    public static Event toEvent(final NewEventDto newDto) {
+    public static Event toEvent(final EventCreateRequest newDto) {
         Event event = new Event();
         event.setAnnotation(newDto.getAnnotation());
         event.setDescription(newDto.getDescription());
         event.setScheduledTime(newDto.getEventDate());
         event.setCreationTimestamp(LocalDateTime.now());
-        event.setLatitude(newDto.getCoordinates().getLat());
-        event.setLongitude(newDto.getCoordinates().getLongitude());
+        event.setLatitude(newDto.getLocation().getLatitude());
+        event.setLongitude(newDto.getLocation().getLongitude());
         event.setIsPaid(false);
-        if (newDto.getPaid() != null) {
-            event.setIsPaid(newDto.getPaid());
+        if (newDto.getIsPaid() != null) {
+            event.setIsPaid(newDto.getIsPaid());
         }
         event.setMaxAttendees(0);
-        if (newDto.getParticipantLimit() != null) {
-            event.setMaxAttendees(newDto.getParticipantLimit());
+        if (newDto.getMaxAttendees() != null) {
+            event.setMaxAttendees(newDto.getMaxAttendees());
         }
         event.setRequiresApproval(true);
-        if (newDto.getRequestModeration() != null) {
-            event.setRequiresApproval(newDto.getRequestModeration());
+        if (newDto.getRequiresApproval() != null) {
+            event.setRequiresApproval(newDto.getRequiresApproval());
         }
         event.setState(EventStatus.IN_MODERATION);
         event.setTitle(newDto.getTitle());
@@ -46,26 +46,26 @@ public class EventMapper {
         dto.setAnnotation(event.getAnnotation());
         dto.setDescription(event.getDescription());
         dto.setEventDate(event.getScheduledTime());
-        dto.setCreatedOn(event.getCreationTimestamp());
+        dto.setCreationTimestamp(event.getCreationTimestamp());
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
-        dto.setInitiator(UserMapper.toUserShortDto(event.getOrganizer()));
-        dto.setCoordinates(new Coordinates(event.getLatitude(), event.getLongitude()));
-        dto.setParticipantLimit(0);
+        dto.setOrganizer(UserMapper.toUserShortDto(event.getOrganizer()));
+        dto.setLocation(new Coordinates(event.getLatitude(), event.getLongitude()));
+        dto.setMaxAttendees(0);
         if (event.getMaxAttendees() != null) {
-            dto.setParticipantLimit(event.getMaxAttendees());
+            dto.setMaxAttendees(event.getMaxAttendees());
         }
-        dto.setRequestModeration(event.getRequiresApproval());
-        dto.setState(event.getState());
-        dto.setPaid(event.getIsPaid());
-        dto.setPublishedOn(event.getPublicationTime());
+        dto.setRequiresApproval(event.getRequiresApproval());
+        dto.setEventStatus(event.getState());
+        dto.setIsPaid(event.getIsPaid());
+        dto.setPublicationTime(event.getPublicationTime());
         dto.setTitle(event.getTitle());
-        dto.setConfirmedRequests(0);
+        dto.setApprovedParticipantsCount(0);
         if (event.getApprovedParticipants() != null) {
-            dto.setConfirmedRequests(event.getApprovedParticipants());
+            dto.setApprovedParticipantsCount(event.getApprovedParticipants());
         }
-        dto.setViews(0);
+        dto.setViewCount(0);
         if (event.getViewCount() != null) {
-            dto.setViews(event.getViewCount());
+            dto.setViewCount(event.getViewCount());
         }
         return dto;
     }
@@ -76,20 +76,20 @@ public class EventMapper {
         dto.setTitle(event.getTitle());
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
-        dto.setInitiator(UserMapper.toUserShortDto(event.getOrganizer()));
+        dto.setOrganizer(UserMapper.toUserShortDto(event.getOrganizer()));
         dto.setEventDate(event.getScheduledTime());
-        dto.setPaid(event.getIsPaid());
-        dto.setParticipantLimit(0);
+        dto.setIsPaid(event.getIsPaid());
+        dto.setMaxAttendees(0);
         if (event.getMaxAttendees() != null) {
-            dto.setParticipantLimit(event.getMaxAttendees());
+            dto.setMaxAttendees(event.getMaxAttendees());
         }
-        dto.setConfirmedRequests(0);
+        dto.setApprovedParticipantsCount(0);
         if (event.getApprovedParticipants() != null) {
-            dto.setConfirmedRequests(event.getApprovedParticipants());
+            dto.setApprovedParticipantsCount(event.getApprovedParticipants());
         }
-        dto.setViews(0);
+        dto.setViewCount(0);
         if (event.getViewCount() != null) {
-            dto.setViews(event.getViewCount());
+            dto.setViewCount(event.getViewCount());
         }
         return dto;
     }

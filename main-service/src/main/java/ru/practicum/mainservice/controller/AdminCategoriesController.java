@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.CategoryDto;
-import ru.practicum.mainservice.dto.NewCategoryDto;
+import ru.practicum.mainservice.dto.CategoryResponse;
+import ru.practicum.mainservice.dto.CategoryCreateRequest;
 import ru.practicum.mainservice.service.CategoryService;
 
 @Slf4j
@@ -25,15 +25,15 @@ public class AdminCategoriesController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto createCategory(@Validated @RequestBody NewCategoryDto categoryDto) {
-        log.info("Создаем категорию {}.", categoryDto.getName());
+    public CategoryResponse createCategory(@Validated @RequestBody CategoryCreateRequest categoryDto) {
+        log.info("Создаем категорию {}.", categoryDto.getCategoryName());
         return categoryService.createCategory(categoryDto);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto updateCategory(@Validated @RequestBody NewCategoryDto categoryDto,
-                                      @PathVariable int id) {
+    public CategoryResponse updateCategory(@Validated @RequestBody CategoryCreateRequest categoryDto,
+                                           @PathVariable int id) {
         log.info("Обновляем категорию id={}.", id);
         return categoryService.updateCategory(id, categoryDto);
     }

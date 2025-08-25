@@ -52,17 +52,17 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public EventFullDto createEvent(NewEventDto newEventDto, Integer userId) {
-        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(HOURS_EVENT_DELAY))) {
+    public EventFullDto createEvent(EventCreateRequest eventCreateRequest, Integer userId) {
+        if (eventCreateRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(HOURS_EVENT_DELAY))) {
             throw new ValidationException(
                     "Field: eventDate. Error: не может быть раньше, чем через "
                             + HOURS_EVENT_DELAY + " часа от текущего момента. Value: "
-                            + newEventDto.getEventDate().format(DATA_TIME_FORMATTER)
+                            + eventCreateRequest.getEventDate().format(DATA_TIME_FORMATTER)
             );
         }
         User user = userService.getUserById(userId);
-        Category category = categoryService.getCategoryById(newEventDto.getCategory());
-        Event event = EventMapper.toEvent(newEventDto);
+        Category category = categoryService.getCategoryById(eventCreateRequest.getCategoryId());
+        Event event = EventMapper.toEvent(eventCreateRequest);
         event.setOrganizer(user);
         event.setCategory(category);
         Event savedEvent = eventRepository.save(event);
@@ -117,7 +117,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public EventFullDto patchEvent(Integer eventId, @Validated UpdateEventUserRequest eventDto, Integer userId) {
+    public EventFullDto patchEvent(Integer eventId, @Validated EventUserUpdateRequest eventDto, Integer userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найдено событие id=" + eventId));
@@ -140,8 +140,8 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getAnnotation() != null) {
             event.setAnnotation(eventDto.getAnnotation());
         }
-        if (eventDto.getCategory() != null) {
-            event.setCategory(categoryService.getCategoryById(eventDto.getCategory()));
+        if (eventDto.getCategoryId() != null) {
+            event.setCategory(categoryService.getCategoryById(eventDto.getCategoryId()));
         }
         if (eventDto.getDescription() != null) {
             event.setDescription(eventDto.getDescription());
@@ -156,23 +156,23 @@ public class EventServiceImpl implements EventService {
             }
             event.setScheduledTime(eventDto.getEventDate());
         }
-        if (eventDto.getCoordinates() != null) {
-            event.setLatitude(eventDto.getCoordinates().getLat());
-            event.setLongitude(eventDto.getCoordinates().getLongitude());
+        if (eventDto.getLocation() != null) {
+            event.setLatitude(eventDto.getLocation().getLatitude());
+            event.setLongitude(eventDto.getLocation().getLongitude());
         }
-        if (eventDto.getPaid() != null) {
-            event.setIsPaid(eventDto.getPaid());
+        if (eventDto.getIsPaid() != null) {
+            event.setIsPaid(eventDto.getIsPaid());
         }
-        if (eventDto.getParticipantLimit() != null) {
-            event.setMaxAttendees(eventDto.getParticipantLimit());
+        if (eventDto.getMaxAttendees() != null) {
+            event.setMaxAttendees(eventDto.getMaxAttendees());
         }
-        if (eventDto.getRequestModeration() != null) {
-            event.setRequiresApproval(eventDto.getRequestModeration());
+        if (eventDto.getRequiresApproval() != null) {
+            event.setRequiresApproval(eventDto.getRequiresApproval());
         }
-        if (eventDto.getStateAction() != null) {
-            if (eventDto.getStateAction().equals(UserEventAction.CANCEL_SUBMISSION)) {
+        if (eventDto.getUserAction() != null) {
+            if (eventDto.getUserAction().equals(UserEventAction.CANCEL_SUBMISSION)) {
                 event.setState(EventStatus.CANCELLED);
-            } else if (eventDto.getStateAction().equals(UserEventAction.SEND_FOR_MODERATION)) {
+            } else if (eventDto.getUserAction().equals(UserEventAction.SEND_FOR_MODERATION)) {
                 event.setState(EventStatus.IN_MODERATION);
             }
         }
@@ -186,7 +186,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto adminUpdateEvent(Integer eventId, UpdateEventAdminRequest eventDto) {
+    public EventFullDto adminUpdateEvent(Integer eventId, EventAdminUpdateRequest eventDto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найдено событие id=" + eventId));
@@ -202,8 +202,8 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getAnnotation() != null) {
             event.setAnnotation(eventDto.getAnnotation());
         }
-        if (eventDto.getCategory() != null) {
-            event.setCategory(categoryService.getCategoryById(eventDto.getCategory()));
+        if (eventDto.getCategoryId() != null) {
+            event.setCategory(categoryService.getCategoryById(eventDto.getCategoryId()));
         }
         if (eventDto.getDescription() != null) {
             event.setDescription(eventDto.getDescription());
@@ -218,36 +218,36 @@ public class EventServiceImpl implements EventService {
             }
             event.setScheduledTime(eventDto.getEventDate());
         }
-        if (eventDto.getCoordinates() != null) {
-            event.setLatitude(eventDto.getCoordinates().getLat());
-            event.setLongitude(eventDto.getCoordinates().getLongitude());
+        if (eventDto.getLocation() != null) {
+            event.setLatitude(eventDto.getLocation().getLatitude());
+            event.setLongitude(eventDto.getLocation().getLongitude());
         }
-        if (eventDto.getPaid() != null) {
-            event.setIsPaid(eventDto.getPaid());
+        if (eventDto.getIsPaid() != null) {
+            event.setIsPaid(eventDto.getIsPaid());
         }
-        if (eventDto.getParticipantLimit() != null) {
-            event.setMaxAttendees(eventDto.getParticipantLimit());
+        if (eventDto.getMaxAttendees() != null) {
+            event.setMaxAttendees(eventDto.getMaxAttendees());
         }
-        if (eventDto.getRequestModeration() != null) {
-            event.setRequiresApproval(eventDto.getRequestModeration());
+        if (eventDto.getRequiresApproval() != null) {
+            event.setRequiresApproval(eventDto.getRequiresApproval());
         }
-        if (eventDto.getStateAction() != null) {
-            if (eventDto.getStateAction().equals(EventModerationAction.APPROVE_PUBLICATION)) {
+        if (eventDto.getModerationAction() != null) {
+            if (eventDto.getModerationAction().equals(EventModerationAction.APPROVE_PUBLICATION)) {
                 if (!event.getState().equals(EventStatus.IN_MODERATION)) {
                     throw new DataConflictException(
                             "Field: stateAction. Error: " +
                                     "Событие id=" + eventId + " должно быть в состоянии ожидания публикации." +
-                                    " Value: " + eventDto.getStateAction()
+                                    " Value: " + eventDto.getModerationAction()
                     );
                 }
                 event.setState(EventStatus.ACTIVE);
                 event.setPublicationTime(LocalDateTime.now());
-            } else if (eventDto.getStateAction().equals(EventModerationAction.CANCEL_PUBLICATION)) {
+            } else if (eventDto.getModerationAction().equals(EventModerationAction.CANCEL_PUBLICATION)) {
                 if (event.getState().equals(EventStatus.ACTIVE)) {
                     throw new DataConflictException(
                             "Field: stateAction. Error: " +
                                     "Нельзя удалить опубликованное событие id=" + eventId +
-                                    " Value: " + eventDto.getStateAction()
+                                    " Value: " + eventDto.getModerationAction()
                     );
                 }
                 event.setState(EventStatus.DECLINED);
@@ -255,7 +255,7 @@ public class EventServiceImpl implements EventService {
                 throw new ValidationException(
                         "Field: stateAction. Error: " +
                                 "Указано непредусмотренное действие. " +
-                                " Value: " + eventDto.getStateAction());
+                                " Value: " + eventDto.getModerationAction());
             }
         }
         if (eventDto.getTitle() != null) {
@@ -369,7 +369,7 @@ public class EventServiceImpl implements EventService {
 
         if (sort.equalsIgnoreCase("VIEWS")) {
             return eventDtos.stream()
-                    .sorted(Comparator.comparing(EventShortDto::getViews).reversed())
+                    .sorted(Comparator.comparing(EventShortDto::getViewCount).reversed())
                     .skip(from).limit(size).toList();
         }
         return eventDtos.stream().skip(from).limit(size).toList();

@@ -10,7 +10,7 @@ import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CompilationMapper;
 import ru.practicum.mainservice.model.EventCollection;
 import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.repository.CompilationRepository;
+import ru.practicum.mainservice.repository.EventCollectionRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
-    private final CompilationRepository compilationRepository;
+    private final EventCollectionRepository eventCollectionRepository;
     private final EventService eventService;
 
     @Override
@@ -27,14 +27,14 @@ public class CompilationServiceImpl implements CompilationService {
         EventCollection eventCollection = CompilationMapper.toCompilation(compilationDto);
         List<Event> events = eventService.findEventsByIdIn(compilationDto.getEventIds());
         eventCollection.setEvents(new HashSet<>(events));
-        EventCollection savedEventCollection = compilationRepository.save(eventCollection);
+        EventCollection savedEventCollection = eventCollectionRepository.save(eventCollection);
         EventCollectionResponse savedEventCollectionResponse = CompilationMapper.toCompilationDto(savedEventCollection);
         return savedEventCollectionResponse;
     }
 
     @Override
     public EventCollectionResponse patchCompilation(Integer compId, EventCollectionUpdateRequest compilationDto) {
-        EventCollection eventCollection = compilationRepository.findById(compId)
+        EventCollection eventCollection = eventCollectionRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
         if (compilationDto.getCollectionTitle() != null) {
             eventCollection.setCollectionTitle(compilationDto.getCollectionTitle());
@@ -48,22 +48,22 @@ public class CompilationServiceImpl implements CompilationService {
                 eventCollection.setEvents(new HashSet<>(events));
             }
         }
-        EventCollection savedEventCollection = compilationRepository.save(eventCollection);
+        EventCollection savedEventCollection = eventCollectionRepository.save(eventCollection);
         EventCollectionResponse savedEventCollectionResponse = CompilationMapper.toCompilationDto(savedEventCollection);
         return savedEventCollectionResponse;
     }
 
     @Override
     public void deleteCompilation(Integer compId) {
-        EventCollection eventCollection = compilationRepository.findById(compId)
+        EventCollection eventCollection = eventCollectionRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
         eventCollection.getEvents().clear();
-        compilationRepository.delete(eventCollection);
+        eventCollectionRepository.delete(eventCollection);
     }
 
     @Override
     public EventCollectionResponse getCompilation(Integer compId) {
-        EventCollection eventCollection = compilationRepository.findById(compId)
+        EventCollection eventCollection = eventCollectionRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
         return CompilationMapper.toCompilationDto(eventCollection);
     }
@@ -72,9 +72,9 @@ public class CompilationServiceImpl implements CompilationService {
     public List<EventCollectionResponse> getCompilations(Boolean pinned, Integer from, Integer size) {
         List<EventCollection> eventCollections;
         if (pinned != null) {
-            eventCollections = compilationRepository.findAllByPinnedEquals(pinned);
+            eventCollections = eventCollectionRepository.findAllByIsPinnedEquals(pinned);
         } else {
-            eventCollections = compilationRepository.findAll();
+            eventCollections = eventCollectionRepository.findAll();
         }
         return eventCollections.stream()
                 .map(CompilationMapper::toCompilationDto)

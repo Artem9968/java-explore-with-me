@@ -23,7 +23,7 @@ import ru.practicum.mainservice.model.EventApprovalStats;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.EventSpecification;
-import ru.practicum.mainservice.repository.RequestRepository;
+import ru.practicum.mainservice.repository.EventRequestRepository;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.StatsDto;
 
@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
     private static final Integer HOURS_EVENT_DELAY = 2;
 
     private final EventRepository eventRepository;
-    private final RequestRepository requestRepository;
+    private final EventRequestRepository eventRequestRepository;
     private final UserService userService;
     private final CategoryService categoryService;
     private final StatsClient statsClient;
@@ -77,14 +77,14 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("Пользователь id=" + userId
                     + " не является инициатором события id=" + eventId);
         }
-        event.setApprovedParticipants(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        event.setApprovedParticipants(eventRequestRepository.getCountApprovedRequestsByEventId(eventId));
         event.setViewCount(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(event);
     }
 
     @Override
     public List<EventShortDto> getEventsByUserId(Integer userId, Integer from, Integer size) {
-        List<Event> events = eventRepository.findEventsByInitiator_Id(userId);
+        List<Event> events = eventRepository.findEventsByOrganizer_Id(userId);
         updateViwesAndRequests(events);
         return events.stream()
                 .skip(from)
@@ -102,7 +102,7 @@ public class EventServiceImpl implements EventService {
         }
 
         List<EventApprovalStats> counts =
-                requestRepository.getCountConfirmedRequests(eventMap.keySet().stream().toList());
+                eventRequestRepository.getCountApprovedRequests(eventMap.keySet().stream().toList());
         for (EventApprovalStats count : counts) {
             Integer eventId = count.getEventId();
             eventMap.get(eventId).setApprovedParticipants(count.getApprovedParticipantsCount().intValue());
@@ -180,7 +180,7 @@ public class EventServiceImpl implements EventService {
             event.setTitle(eventDto.getTitle());
         }
         Event savedEvent = eventRepository.save(event);
-        savedEvent.setApprovedParticipants(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        savedEvent.setApprovedParticipants(eventRequestRepository.getCountApprovedRequestsByEventId(eventId));
         savedEvent.setViewCount(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(savedEvent);
     }
@@ -262,7 +262,7 @@ public class EventServiceImpl implements EventService {
             event.setTitle(eventDto.getTitle());
         }
         Event savedEvent = eventRepository.save(event);
-        savedEvent.setApprovedParticipants(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        savedEvent.setApprovedParticipants(eventRequestRepository.getCountApprovedRequestsByEventId(eventId));
         savedEvent.setViewCount(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(savedEvent);
     }
@@ -278,7 +278,7 @@ public class EventServiceImpl implements EventService {
                 });
 
         log.info("📊📊📊 Before setting confirmedRequests: {}", event.getViewCount());
-        event.setApprovedParticipants(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        event.setApprovedParticipants(eventRequestRepository.getCountApprovedRequestsByEventId(eventId));
         log.info("📊📊📊 After confirmedRequests: {}", event.getViewCount());
 
         log.info("📡📡📡 Calling statsClient.getEventViews...");
@@ -330,7 +330,7 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = Specification.where(null);
 
         if (text != null) {
-            spec = spec.and(EventSpecification.annotetionContains(text));
+            spec = spec.and(EventSpecification.annotationContains(text));
             spec = spec.or(EventSpecification.descriptionContains(text));
         }
 
@@ -339,14 +339,14 @@ public class EventServiceImpl implements EventService {
         }
 
         if (paid != null) {
-            spec = spec.and(EventSpecification.paidEqual(paid));
+            spec = spec.and(EventSpecification.isPaidEqual(paid));
         }
 
         if (startDate != null) {
-            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+            spec = spec.and(EventSpecification.scheduledTimeAfter(startDate));
         }
         if (endDate != null) {
-            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+            spec = spec.and(EventSpecification.scheduledTimeBefore(endDate));
         }
 
         List<Event> events = eventRepository.findAll(spec,
@@ -402,7 +402,7 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = Specification.where(null);
 
         if (users != null) {
-            spec = spec.and(EventSpecification.eventInitiatorIdIn(users));
+            spec = spec.and(EventSpecification.eventOrganizerIdIn(users));
         }
 
         if (categories != null) {
@@ -410,14 +410,14 @@ public class EventServiceImpl implements EventService {
         }
 
         if (states != null) {
-            spec = spec.and(EventSpecification.eventStateIn(states));
+            spec = spec.and(EventSpecification.eventStatusIn(states));
         }
 
         if (startDate != null) {
-            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+            spec = spec.and(EventSpecification.scheduledTimeAfter(startDate));
         }
         if (endDate != null) {
-            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+            spec = spec.and(EventSpecification.scheduledTimeBefore(endDate));
         }
 
         List<Event> events = eventRepository.findAll(spec,

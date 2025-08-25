@@ -1,49 +1,49 @@
 package ru.practicum.mainservice.repository;
 
-import org.springframework.data.jpa.domain.Specification;
-import ru.practicum.mainservice.model.Event;
-
-import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDateTime;
+import ru.practicum.mainservice.model.Event;
+import org.springframework.data.jpa.domain.Specification;
 
 public class EventSpecification {
-    public static Specification<Event> annotetionContains(String text) {
+
+    public static Specification<Event> eventStatusIn(List<String> statusList) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.get("annotation"), "%" + text + "%"));
+                criteriaBuilder.in(root.get("eventStatus")).value(statusList));
     }
 
-    public static Specification<Event> descriptionContains(String text) {
+    public static Specification<Event> eventOrganizerIdIn(List<Integer> organizerIdList) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.get("description"), "%" + text + "%"));
+                criteriaBuilder.in(root.join("organizer").get("id")).value(organizerIdList));
     }
 
-    public static Specification<Event> categoryIn(List<Integer> categories) {
+    public static Specification<Event> scheduledTimeBefore(LocalDateTime endDateTime) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.in(root.join("category").get("id")).value(categories));
+                criteriaBuilder.lessThan(root.get("scheduledTime"), endDateTime));
     }
 
-    public static Specification<Event> paidEqual(Boolean paid) {
+    public static Specification<Event> scheduledTimeAfter(LocalDateTime startDateTime) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("paid"), paid));
+                criteriaBuilder.greaterThanOrEqualTo(root.get("scheduledTime"), startDateTime));
     }
 
-    public static Specification<Event> eventDateAfter(LocalDateTime startDate) {
+    public static Specification<Event> isPaidEqual(Boolean isPaidFlag) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), startDate));
+                criteriaBuilder.equal(root.get("isPaid"), isPaidFlag));
     }
 
-    public static Specification<Event> eventDateBefore(LocalDateTime endDate) {
+    public static Specification<Event> categoryIn(List<Integer> categoryIdList) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.lessThan(root.get("eventDate"), endDate));
+                criteriaBuilder.in(root.join("category").get("id")).value(categoryIdList));
     }
 
-    public static Specification<Event> eventInitiatorIdIn(List<Integer> initiatorIds) {
+    public static Specification<Event> descriptionContains(String searchText) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.in(root.join("initiator").get("id")).value(initiatorIds));
+                criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
     }
 
-    public static Specification<Event> eventStateIn(List<String> states) {
+    public static Specification<Event> annotationContains(String annotationText) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.in(root.get("state")).value(states));
+                criteriaBuilder.like(root.get("briefDescription"), "%" + annotationText + "%"));
     }
 }

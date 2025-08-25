@@ -15,7 +15,7 @@ import ru.practicum.mainservice.mapper.RequestMapper;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.EventRequest;
 import ru.practicum.mainservice.model.User;
-import ru.practicum.mainservice.repository.RequestRepository;
+import ru.practicum.mainservice.repository.EventRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
-    private final RequestRepository requestRepository;
+    private final EventRequestRepository eventRequestRepository;
     private final EventService eventService;
     private final UserService userService;
 
@@ -65,13 +65,13 @@ public class RequestServiceImpl implements RequestService {
             eventRequest.setRequestState(RequestState.APPROVED);
         }
         eventRequest.setRequestDate(LocalDateTime.now());
-        return requestRepository.save(eventRequest);
+        return eventRequestRepository.save(eventRequest);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ParticipationRequestResponse> getRequestsByUserId(Integer userId) {
-        List<EventRequest> eventRequests = requestRepository.findAllByRequester_Id(userId);
+        List<EventRequest> eventRequests = eventRequestRepository.findAllByRequestingUser_Id(userId);
         if (eventRequests.isEmpty()) {
             return List.of();
         }
@@ -80,7 +80,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public EventRequest canceledRequest(Integer userId, Integer requestId) {
-        EventRequest eventRequest = requestRepository.findById(requestId)
+        EventRequest eventRequest = eventRequestRepository.findById(requestId)
                 .orElseThrow(() ->
                         new NotFoundException("Не найден запрос id=" + requestId));
         if (!eventRequest.getRequestingUser().getId().equals(userId)) {
@@ -91,7 +91,7 @@ public class RequestServiceImpl implements RequestService {
             );
         }
         eventRequest.setRequestState(RequestState.CANCELLED);
-        return requestRepository.save(eventRequest);
+        return eventRequestRepository.save(eventRequest);
     }
 
     /**
@@ -107,7 +107,7 @@ public class RequestServiceImpl implements RequestService {
                             ". Value: " + event.getOrganizer().getId()
             );
         }
-        return requestRepository.findAllByEvent_Id(eventId);
+        return eventRequestRepository.findAllByEvent_Id(eventId);
     }
 
     /**
@@ -126,7 +126,7 @@ public class RequestServiceImpl implements RequestService {
 
         // ...нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         // (Ожидается код ошибки 409)
-        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
+        Integer confirmedRequests = eventRequestRepository.getCountApprovedRequestsByEventId(eventId);
         if ((event.getMaxAttendees() > 0)
                 && event.getMaxAttendees().equals(confirmedRequests)) {
             throw new DataConflictException(
@@ -146,7 +146,7 @@ public class RequestServiceImpl implements RequestService {
 
         // Проверяем заявки из списка
         for (Integer requestId : requestIds) {
-            EventRequest eventRequest = requestRepository.findById(requestId)
+            EventRequest eventRequest = eventRequestRepository.findById(requestId)
                     .orElseThrow(() -> new NotFoundException("Не найдена заявка id=" + requestId));
             // ... статус можно изменить только у заявок, находящихся в состоянии ожидания
             // (Ожидается код ошибки 409)
@@ -163,7 +163,7 @@ public class RequestServiceImpl implements RequestService {
                 status = RequestState.DECLINED;
             }
             eventRequest.setRequestState(status);
-            EventRequest savedEventRequest = requestRepository.save(eventRequest);
+            EventRequest savedEventRequest = eventRequestRepository.save(eventRequest);
             if (savedEventRequest.getRequestState().equals(RequestState.APPROVED)) {
                 requestGroupDto.getApprovedRequests().add(RequestMapper.toRequestDto(savedEventRequest));
                 confirmedRequests++;

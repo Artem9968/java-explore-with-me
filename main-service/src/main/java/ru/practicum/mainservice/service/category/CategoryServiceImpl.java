@@ -1,6 +1,6 @@
 package ru.practicum.mainservice.service.category;
 
-import lombok.extern.slf4j.Slf4j;
+
 import ru.practicum.mainservice.storage.event.EventRepository;
 import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.model.event.Event;

@@ -4,7 +4,7 @@ import java.util.List;
 import ru.practicum.mainservice.model.user.User;
 
 public interface UserService {
-    
+
     void removeUser(Integer userId);
 
     User createUser(User user);

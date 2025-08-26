@@ -1,16 +1,16 @@
 package ru.practicum.mainservice.repository;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import ru.practicum.mainservice.model.Event;
 
-import java.util.List;
-
 public interface EventRepository extends JpaRepository<Event, Integer>,
         JpaSpecificationExecutor<Event> {
-    List<Event> findEventsByInitiator_Id(int id);
 
-    List<Event> findEventsByIdIn(List<Integer> ids);
+    List<Event> findByInitiatorId(int id);
 
-    List<Event> findEventsByCategory_Id(int id);
+    List<Event> findByIdIn(List<Integer> ids);
+
+    List<Event> findByCategoryId(int id);
 }

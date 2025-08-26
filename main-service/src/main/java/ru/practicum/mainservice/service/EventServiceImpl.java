@@ -77,14 +77,14 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("Пользователь id=" + userId
                     + " не является инициатором события id=" + eventId);
         }
-        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        event.setConfirmedRequests(requestRepository.countConfirmedByEventId(eventId));
         event.setViews(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(event);
     }
 
     @Override
     public List<EventShortDto> getEventsByUserId(Integer userId, Integer from, Integer size) {
-        List<Event> events = eventRepository.findEventsByInitiator_Id(userId);
+        List<Event> events = eventRepository.findByInitiatorId(userId);
         updateViwesAndRequests(events);
         return events.stream()
                 .skip(from)
@@ -102,7 +102,7 @@ public class EventServiceImpl implements EventService {
         }
 
         List<EventConfirmedRequestCount> counts =
-                requestRepository.getCountConfirmedRequests(eventMap.keySet().stream().toList());
+                requestRepository.countConfirmedByEventIdIn(eventMap.keySet().stream().toList());
         for (EventConfirmedRequestCount count : counts) {
             Integer eventId = count.getEventId();
             eventMap.get(eventId).setConfirmedRequests(count.getConfirmedRequestCount().intValue());
@@ -180,7 +180,7 @@ public class EventServiceImpl implements EventService {
             event.setTitle(eventDto.getTitle());
         }
         Event savedEvent = eventRepository.save(event);
-        savedEvent.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        savedEvent.setConfirmedRequests(requestRepository.countConfirmedByEventId(eventId));
         savedEvent.setViews(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(savedEvent);
     }
@@ -262,7 +262,7 @@ public class EventServiceImpl implements EventService {
             event.setTitle(eventDto.getTitle());
         }
         Event savedEvent = eventRepository.save(event);
-        savedEvent.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        savedEvent.setConfirmedRequests(requestRepository.countConfirmedByEventId(eventId));
         savedEvent.setViews(statsClient.getEventViews(eventId, true));
         return EventMapper.toFullDto(savedEvent);
     }
@@ -278,7 +278,7 @@ public class EventServiceImpl implements EventService {
                 });
 
         log.info("📊📊📊 Before setting confirmedRequests: {}", event.getViews());
-        event.setConfirmedRequests(requestRepository.getCountConfirmedRequestsByEventId(eventId));
+        event.setConfirmedRequests(requestRepository.countConfirmedByEventId(eventId));
         log.info("📊📊📊 After confirmedRequests: {}", event.getViews());
 
         log.info("📡📡📡 Calling statsClient.getEventViews...");
@@ -330,23 +330,23 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = Specification.where(null);
 
         if (text != null) {
-            spec = spec.and(EventSpecification.annotetionContains(text));
-            spec = spec.or(EventSpecification.descriptionContains(text));
+            spec = spec.and(EventSpecification.hasAnnotationWithText(text));
+            spec = spec.or(EventSpecification.hasDescriptionWithText(text));
         }
 
         if (categories != null) {
-            spec = spec.and(EventSpecification.categoryIn(categories));
+            spec = spec.and(EventSpecification.hasCategoryIn(categories));
         }
 
         if (paid != null) {
-            spec = spec.and(EventSpecification.paidEqual(paid));
+            spec = spec.and(EventSpecification.hasPaid(paid));
         }
 
         if (startDate != null) {
-            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+            spec = spec.and(EventSpecification.withEventDateAfter(startDate));
         }
         if (endDate != null) {
-            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+            spec = spec.and(EventSpecification.withEventDateBefore(endDate));
         }
 
         List<Event> events = eventRepository.findAll(spec,
@@ -402,22 +402,22 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = Specification.where(null);
 
         if (users != null) {
-            spec = spec.and(EventSpecification.eventInitiatorIdIn(users));
+            spec = spec.and(EventSpecification.withInitiatorIdIn(users));
         }
 
         if (categories != null) {
-            spec = spec.and(EventSpecification.categoryIn(categories));
+            spec = spec.and(EventSpecification.hasCategoryIn(categories));
         }
 
         if (states != null) {
-            spec = spec.and(EventSpecification.eventStateIn(states));
+            spec = spec.and(EventSpecification.withStateIn(states));
         }
 
         if (startDate != null) {
-            spec = spec.and(EventSpecification.eventDateAfter(startDate));
+            spec = spec.and(EventSpecification.withEventDateAfter(startDate));
         }
         if (endDate != null) {
-            spec = spec.and(EventSpecification.eventDateBefore(endDate));
+            spec = spec.and(EventSpecification.withEventDateBefore(endDate));
         }
 
         List<Event> events = eventRepository.findAll(spec,
@@ -435,7 +435,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> findEventsByIdIn(List<Integer> eventIds) {
-        List<Event> events = eventRepository.findEventsByIdIn(eventIds);
+        List<Event> events = eventRepository.findByIdIn(eventIds);
         if (events.isEmpty()) {
             return List.of();
         }

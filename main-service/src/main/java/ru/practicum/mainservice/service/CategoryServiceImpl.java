@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Integer id) {
         categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена категория id=" + id));
-        List<Event> events = eventRepository.findEventsByCategory_Id(id);
+        List<Event> events = eventRepository.findByCategoryId(id);
         if (events.size() > 0) {
             throw new DataConflictException(
                     "Категория id=" + id + " не пустая.");

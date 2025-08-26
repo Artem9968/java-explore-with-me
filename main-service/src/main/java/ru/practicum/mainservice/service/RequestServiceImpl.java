@@ -126,7 +126,7 @@ public class RequestServiceImpl implements RequestService {
 
         // ...нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         // (Ожидается код ошибки 409)
-        Integer confirmedRequests = requestRepository.getCountConfirmedRequestsByEventId(eventId);
+        Integer confirmedRequests = requestRepository.countConfirmedByEventId(eventId);
         if ((event.getParticipantLimit() > 0)
                 && event.getParticipantLimit().equals(confirmedRequests)) {
             throw new DataConflictException(

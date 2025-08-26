@@ -72,7 +72,7 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         List<Compilation> compilations;
         if (pinned != null) {
-            compilations = compilationRepository.findAllByPinnedEquals(pinned);
+            compilations = compilationRepository.findByPinned(pinned);
         } else {
             compilations = compilationRepository.findAll();
         }

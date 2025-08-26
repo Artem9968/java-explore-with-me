@@ -1,27 +1,27 @@
 package ru.practicum.mainservice.service;
 
-import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewEventDto;
-import ru.practicum.mainservice.dto.UpdateEventAdminRequest;
-import ru.practicum.mainservice.dto.UpdateEventUserRequest;
+import ru.practicum.mainservice.dto.event.EventFullDto;
+import ru.practicum.mainservice.dto.event.EventShortDto;
+import ru.practicum.mainservice.dto.event.NewEventDto;
+import ru.practicum.mainservice.dto.event.UpdateEventAdminRequest;
+import ru.practicum.mainservice.dto.event.UpdateEventUserRequest;
 import ru.practicum.statsdto.StatsDto;
 import ru.practicum.statsclient.StatsClient;
-import ru.practicum.mainservice.repository.RequestRepository;
-import ru.practicum.mainservice.repository.EventSpecification;
-import ru.practicum.mainservice.repository.EventRepository;
-import ru.practicum.mainservice.model.User;
-import ru.practicum.mainservice.model.EventConfirmedRequestCount;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.Category;
+import ru.practicum.mainservice.repository.request.ParticipationRequestRepository;
+import ru.practicum.mainservice.repository.event.EventSpecification;
+import ru.practicum.mainservice.repository.event.EventRepository;
+import ru.practicum.mainservice.model.user.User;
+import ru.practicum.mainservice.model.event.EventConfirmedRequestCount;
+import ru.practicum.mainservice.model.event.Event;
+import ru.practicum.mainservice.model.category.Category;
 import ru.practicum.mainservice.mapper.EventMapper;
 import ru.practicum.mainservice.exception.ValidationException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.exception.DataConflictException;
 import ru.practicum.mainservice.exception.BadRequestException;
-import ru.practicum.mainservice.model.enums.EventUserAction;
+import ru.practicum.mainservice.model.enums.EventUserStateAction;
 import ru.practicum.mainservice.model.enums.EventState;
-import ru.practicum.mainservice.model.enums.EventAdminAction;
+import ru.practicum.mainservice.model.enums.EventAdminStateAction;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +48,7 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
     private final CategoryService categoryService;
     private final UserService userService;
-    private final RequestRepository requestRepository;
+    private final ParticipationRequestRepository participationRequestRepository;
     private final EventRepository eventRepository;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final Integer hoursEventDelay = 2;
@@ -90,7 +90,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private void updateEventViewsAndRequests(Event event) {
-        Integer confirmedRequests = requestRepository.countConfirmedByEventId(event.getId());
+        Integer confirmedRequests = participationRequestRepository.countConfirmedByEventId(event.getId());
         Integer views = statsClient.getEventViews(event.getId(), true);
         event.setConfirmedRequests(confirmedRequests);
         event.setViews(views);
@@ -105,7 +105,7 @@ public class EventServiceImpl implements EventService {
             eventUris.add("/events/" + event.getId());
         }
 
-        List<EventConfirmedRequestCount> counts = requestRepository.countConfirmedByEventIdIn(new ArrayList<>(eventMap.keySet()));
+        List<EventConfirmedRequestCount> counts = participationRequestRepository.countConfirmedByEventIdIn(new ArrayList<>(eventMap.keySet()));
         for (EventConfirmedRequestCount count : counts) {
             Event event = eventMap.get(count.getEventId());
             if (event != null) {
@@ -334,25 +334,25 @@ public class EventServiceImpl implements EventService {
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
     }
 
-    private void handleUserStateAction(Event event, EventUserAction stateAction) {
+    private void handleUserStateAction(Event event, EventUserStateAction stateAction) {
         if (stateAction != null) {
-            if (stateAction == EventUserAction.CANCEL_REVIEW) {
+            if (stateAction == EventUserStateAction.CANCEL_REVIEW) {
                 event.setState(EventState.CANCELED);
-            } else if (stateAction == EventUserAction.SEND_TO_REVIEW) {
+            } else if (stateAction == EventUserStateAction.SEND_TO_REVIEW) {
                 event.setState(EventState.PENDING);
             }
         }
     }
 
-    private void handleAdminStateAction(Event event, EventAdminAction stateAction, Integer eventId) {
+    private void handleAdminStateAction(Event event, EventAdminStateAction stateAction, Integer eventId) {
         if (stateAction != null) {
-            if (stateAction == EventAdminAction.PUBLISH_EVENT) {
+            if (stateAction == EventAdminStateAction.PUBLISH_EVENT) {
                 if (event.getState() != EventState.PENDING) {
                     throw new DataConflictException("Событие должно быть в состоянии ожидания публикации");
                 }
                 event.setState(EventState.PUBLISHED);
                 event.setPublishedOn(LocalDateTime.now());
-            } else if (stateAction == EventAdminAction.REJECT_EVENT) {
+            } else if (stateAction == EventAdminStateAction.REJECT_EVENT) {
                 if (event.getState() == EventState.PUBLISHED) {
                     throw new DataConflictException("Нельзя удалить опубликованное событие");
                 }

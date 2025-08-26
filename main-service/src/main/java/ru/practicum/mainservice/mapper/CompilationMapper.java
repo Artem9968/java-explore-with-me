@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.model.Compilation;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
+import ru.practicum.mainservice.model.compilation.Compilation;
+import ru.practicum.mainservice.dto.event.EventShortDto;
+import ru.practicum.mainservice.dto.compilation.CompilationDto;
+import ru.practicum.mainservice.dto.compilation.NewCompilationDto;
 
 import java.util.List;
 

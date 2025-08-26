@@ -1,13 +1,13 @@
 package ru.practicum.mainservice.service;
 
-import ru.practicum.mainservice.repository.CompilationRepository;
-import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.repository.compilation.CompilationRepository;
+import ru.practicum.mainservice.model.event.Event;
 import ru.practicum.mainservice.mapper.CompilationMapper;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
-import ru.practicum.mainservice.model.Compilation;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.CompilationDto;
+import ru.practicum.mainservice.dto.compilation.UpdateCompilationRequest;
+import ru.practicum.mainservice.model.compilation.Compilation;
+import ru.practicum.mainservice.dto.compilation.NewCompilationDto;
+import ru.practicum.mainservice.dto.compilation.CompilationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class CompilationServiceImpl implements CompilationService {
                 compilationRepository.findAll();
     }
 
-    private void updateCompilationFields(Compilation compilation, PatchCompilationDto dto) {
+    private void updateCompilationFields(Compilation compilation, UpdateCompilationRequest dto) {
         if (dto.getTitle() != null) {
             compilation.setTitle(dto.getTitle());
         }
@@ -74,7 +74,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto updateCompilation(Integer compId, PatchCompilationDto compilationDto) {
+    public CompilationDto updateCompilation(Integer compId, UpdateCompilationRequest compilationDto) {
         Compilation compilation = findCompilationOrThrow(compId);
         updateCompilationFields(compilation, compilationDto);
         Compilation savedCompilation = compilationRepository.save(compilation);

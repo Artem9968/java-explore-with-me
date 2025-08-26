@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
-import ru.practicum.mainservice.dto.CompilationDto;
+import ru.practicum.mainservice.dto.compilation.NewCompilationDto;
+import ru.practicum.mainservice.dto.compilation.UpdateCompilationRequest;
+import ru.practicum.mainservice.dto.compilation.CompilationDto;
 import ru.practicum.mainservice.service.CompilationService;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class AdminCompilationsController {
     @PatchMapping("/{compilationId}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationDto updateCompilation(@PathVariable Integer compilationId,
-                                          @Validated @RequestBody PatchCompilationDto patchDto) {
+                                          @Validated @RequestBody UpdateCompilationRequest patchDto) {
         log.info("Редактируем подборку событий '{}'.", patchDto.getTitle());
         return compilationService.updateCompilation(compilationId, patchDto);
     }

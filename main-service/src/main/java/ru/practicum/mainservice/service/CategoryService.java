@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.service;
 
 import java.util.List;
-import ru.practicum.mainservice.dto.CategoryDto;
-import ru.practicum.mainservice.dto.NewCategoryDto;
-import ru.practicum.mainservice.model.Category;
+import ru.practicum.mainservice.dto.category.CategoryDto;
+import ru.practicum.mainservice.dto.category.NewCategoryDto;
+import ru.practicum.mainservice.model.category.Category;
 
 public interface CategoryService {
 

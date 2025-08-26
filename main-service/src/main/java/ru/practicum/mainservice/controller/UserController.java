@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 
 
-import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewEventDto;
-import ru.practicum.mainservice.dto.RequestDto;
-import ru.practicum.mainservice.dto.RequestGroupDto;
-import ru.practicum.mainservice.dto.RequestUpdateDto;
-import ru.practicum.mainservice.dto.UpdateEventUserRequest;
+import ru.practicum.mainservice.dto.event.EventFullDto;
+import ru.practicum.mainservice.dto.event.EventShortDto;
+import ru.practicum.mainservice.dto.event.NewEventDto;
+import ru.practicum.mainservice.dto.request.ParticipationRequestDto;
+import ru.practicum.mainservice.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.mainservice.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.mainservice.dto.event.UpdateEventUserRequest;
 import ru.practicum.mainservice.service.RequestService;
 import ru.practicum.mainservice.service.EventService;
-import ru.practicum.mainservice.model.Request;
+import ru.practicum.mainservice.model.request.ParticipationRequest;
 import ru.practicum.mainservice.mapper.RequestMapper;
 
 import java.util.List;
@@ -74,8 +74,8 @@ public class UserController {
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestDto> getRequestsForEvent(@PathVariable int userId,
-                                                @PathVariable int eventId) {
+    public List<ParticipationRequestDto> getRequestsForEvent(@PathVariable int userId,
+                                                             @PathVariable int eventId) {
         log.info("Пользователь id={} проверяет заявки на событие id={}", userId, eventId);
         return requestService.findEventRequests(userId, eventId)
                 .stream()
@@ -85,33 +85,33 @@ public class UserController {
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public RequestGroupDto updateRequestsForEvent(@PathVariable int userId,
-                                                  @PathVariable int eventId,
-                                                  @RequestBody RequestUpdateDto requestUpdates) {
+    public EventRequestStatusUpdateResult updateRequestsForEvent(@PathVariable int userId,
+                                                                 @PathVariable int eventId,
+                                                                 @RequestBody EventRequestStatusUpdateRequest requestUpdates) {
         log.info("Пользователь id={} обновляет статусы заявок для события id={}", userId, eventId);
         return requestService.updateRequestStatuses(userId, eventId, requestUpdates);
     }
 
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestDto createRequest(@PathVariable int userId,
-                                    @RequestParam Integer eventId) {
+    public ParticipationRequestDto createRequest(@PathVariable int userId,
+                                                 @RequestParam Integer eventId) {
         log.info("Пользователь id={} создает заявку на участие в событии id={}", userId, eventId);
-        Request request = requestService.createRequest(userId, eventId);
-        return RequestMapper.toRequestDto(request);
+        ParticipationRequest participationRequest = requestService.createRequest(userId, eventId);
+        return RequestMapper.toRequestDto(participationRequest);
     }
 
     @GetMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestDto> getUserRequests(@PathVariable int userId) {
+    public List<ParticipationRequestDto> getUserRequests(@PathVariable int userId) {
         log.info("Пользователь id={} получает свои заявки", userId);
         return requestService.findUserRequests(userId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public RequestDto cancelRequest(@PathVariable int userId,
-                                    @PathVariable int requestId) {
+    public ParticipationRequestDto cancelRequest(@PathVariable int userId,
+                                                 @PathVariable int requestId) {
         log.info("Пользователь id={} отменяет заявку id={}", userId, requestId);
         return RequestMapper.toRequestDto(requestService.cancelRequest(userId, requestId));
     }

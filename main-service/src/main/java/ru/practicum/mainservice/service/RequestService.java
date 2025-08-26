@@ -1,20 +1,20 @@
 package ru.practicum.mainservice.service;
 
 import java.util.List;
-import ru.practicum.mainservice.dto.RequestDto;
-import ru.practicum.mainservice.dto.RequestGroupDto;
-import ru.practicum.mainservice.dto.RequestUpdateDto;
-import ru.practicum.mainservice.model.Request;
+import ru.practicum.mainservice.dto.request.ParticipationRequestDto;
+import ru.practicum.mainservice.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.mainservice.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.mainservice.model.request.ParticipationRequest;
 
 public interface RequestService {
 
-    RequestGroupDto updateRequestStatuses(Integer userId, Integer eventId, RequestUpdateDto requestUpdateDto);
+    EventRequestStatusUpdateResult updateRequestStatuses(Integer userId, Integer eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
-    List<Request> findEventRequests(Integer userId, Integer eventId);
+    List<ParticipationRequest> findEventRequests(Integer userId, Integer eventId);
 
-    Request cancelRequest(Integer userId, Integer requestId);
+    ParticipationRequest cancelRequest(Integer userId, Integer requestId);
 
-    List<RequestDto> findUserRequests(Integer userId);
+    List<ParticipationRequestDto> findUserRequests(Integer userId);
 
-    Request createRequest(Integer userId, Integer eventId);
+    ParticipationRequest createRequest(Integer userId, Integer eventId);
 }

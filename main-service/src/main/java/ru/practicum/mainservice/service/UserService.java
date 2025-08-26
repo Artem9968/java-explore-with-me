@@ -1,7 +1,7 @@
 package ru.practicum.mainservice.service;
 
 import java.util.List;
-import ru.practicum.mainservice.model.User;
+import ru.practicum.mainservice.model.user.User;
 
 public interface UserService {
     

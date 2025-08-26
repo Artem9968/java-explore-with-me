@@ -1,7 +1,7 @@
 package ru.practicum.mainservice.service;
 
-import ru.practicum.mainservice.repository.UserRepository;
-import ru.practicum.mainservice.model.User;
+import ru.practicum.mainservice.repository.user.UserRepository;
+import ru.practicum.mainservice.model.user.User;
 import ru.practicum.mainservice.exception.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;

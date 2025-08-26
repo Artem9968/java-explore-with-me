@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.service;
 
 import java.util.List;
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
+import ru.practicum.mainservice.dto.compilation.CompilationDto;
+import ru.practicum.mainservice.dto.compilation.NewCompilationDto;
+import ru.practicum.mainservice.dto.compilation.UpdateCompilationRequest;
 
 public interface CompilationService {
 
@@ -13,7 +13,7 @@ public interface CompilationService {
 
     void removeCompilation(Integer compId);
 
-    CompilationDto updateCompilation(Integer compId, PatchCompilationDto compilationDto);
+    CompilationDto updateCompilation(Integer compId, UpdateCompilationRequest compilationDto);
 
     CompilationDto createCompilation(NewCompilationDto compilationDto);
 

@@ -1,14 +1,14 @@
 package ru.practicum.mainservice.service;
 
-import ru.practicum.mainservice.repository.EventRepository;
+import ru.practicum.mainservice.repository.event.EventRepository;
 import ru.practicum.mainservice.exception.DataConflictException;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.repository.CategoryRepository;
+import ru.practicum.mainservice.model.event.Event;
+import ru.practicum.mainservice.repository.category.CategoryRepository;
 import ru.practicum.mainservice.mapper.CategoryMapper;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.dto.NewCategoryDto;
-import ru.practicum.mainservice.model.Category;
-import ru.practicum.mainservice.dto.CategoryDto;
+import ru.practicum.mainservice.dto.category.NewCategoryDto;
+import ru.practicum.mainservice.model.category.Category;
+import ru.practicum.mainservice.dto.category.CategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,10 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.dto.NewEventDto;
-import ru.practicum.mainservice.dto.EventFullDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.Location;
+import ru.practicum.mainservice.dto.event.NewEventDto;
+import ru.practicum.mainservice.dto.event.EventFullDto;
+import ru.practicum.mainservice.dto.event.EventShortDto;
+import ru.practicum.mainservice.model.event.Event;
+import ru.practicum.mainservice.model.event.Location;
 import ru.practicum.mainservice.model.enums.EventState;
 
 public class EventMapper {

@@ -1,6 +1,6 @@
 package ru.practicum.mainservice.service.compilation;
 
-import lombok.extern.slf4j.Slf4j;
+
 import ru.practicum.mainservice.storage.compilation.CompilationRepository;
 import ru.practicum.mainservice.model.event.Event;
 import ru.practicum.mainservice.mapper.compilation.CompilationMapper;

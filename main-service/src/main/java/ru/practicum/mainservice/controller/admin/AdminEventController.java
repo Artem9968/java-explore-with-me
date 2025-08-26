@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.controller.admin;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import ru.practicum.mainservice.dto.event.UpdateEventAdminRequest;
 import ru.practicum.mainservice.service.event.EventService;
 
 import java.util.List;
+
 
 @Slf4j
 @RestController

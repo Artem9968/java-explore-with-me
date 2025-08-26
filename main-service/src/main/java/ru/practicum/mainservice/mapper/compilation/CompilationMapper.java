@@ -31,4 +31,6 @@ public class CompilationMapper {
         result.setPinned(newDto.getPinned() != null ? newDto.getPinned() : false);
         return result;
     }
+
+
 }

@@ -55,7 +55,7 @@ public class EventServiceImpl implements EventService {
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Integer hoursEventDelay = 2;   // дата и время на которые намечено событие не может быть раньше, чем
-                                                 // через два часа от текущего момента
+    // через два часа от текущего момента
 
     private Event findEventOrThrow(Integer eventId) {
         return eventRepository.findById(eventId)
@@ -87,7 +87,7 @@ public class EventServiceImpl implements EventService {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new BadRequestException(
                     "Введен некорректный интервал времени."
-                             + startDate.format(dateTimeFormatter)
+                            + startDate.format(dateTimeFormatter)
                             + ", " + endDate.format(dateTimeFormatter)
             );
         }
@@ -133,26 +133,26 @@ public class EventServiceImpl implements EventService {
 
     private Specification<Event> buildSearchSpecification(String text, List<Integer> categories, Boolean paid,
                                                           LocalDateTime startDate, LocalDateTime endDate) {
-        Specification<Event> searchSpec  = Specification.where(null);
+        Specification<Event> searchSpec = Specification.where(null);
 
         if (text != null) {
-            searchSpec  = searchSpec .and(EventSpecification.hasAnnotationWithText(text)
+            searchSpec = searchSpec.and(EventSpecification.hasAnnotationWithText(text)
                     .or(EventSpecification.hasDescriptionWithText(text)));
         }
         if (categories != null) {
-            searchSpec  = searchSpec .and(EventSpecification.hasCategoryIn(categories));
+            searchSpec = searchSpec.and(EventSpecification.hasCategoryIn(categories));
         }
         if (paid != null) {
-            searchSpec  = searchSpec .and(EventSpecification.hasPaid(paid));
+            searchSpec = searchSpec.and(EventSpecification.hasPaid(paid));
         }
         if (startDate != null) {
-            searchSpec  = searchSpec .and(EventSpecification.withEventDateAfter(startDate));
+            searchSpec = searchSpec.and(EventSpecification.withEventDateAfter(startDate));
         }
         if (endDate != null) {
-            searchSpec  = searchSpec .and(EventSpecification.withEventDateBefore(endDate));
+            searchSpec = searchSpec.and(EventSpecification.withEventDateBefore(endDate));
         }
 
-        return searchSpec ;
+        return searchSpec;
     }
 
     private Specification<Event> buildAdminSpecification(List<String> states, List<Integer> users,

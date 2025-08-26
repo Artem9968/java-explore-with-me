@@ -7,8 +7,8 @@ import jakarta.persistence.EnumType;
 import ru.practicum.mainservice.model.category.Category;
 import ru.practicum.mainservice.model.user.User;
 import ru.practicum.mainservice.model.enums.EventState;
-import jakarta.persistence.Transient;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Transient;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
@@ -35,6 +35,9 @@ public class Event {
     @Column(name = "annotation", nullable = false)
     private String annotation;
 
+    @Transient
+    private Integer cachedViews;
+
     @Column(name = "description")
     private String description;
 
@@ -48,6 +51,9 @@ public class Event {
 
     @Column(name = "eventdate", nullable = false)
     private LocalDateTime eventDate;
+
+    @Transient
+    private Integer cachedConfirmedRequests;
 
     @Column(name = "createdon", nullable = false)
     private LocalDateTime createdOn;
@@ -74,9 +80,4 @@ public class Event {
     @Column(name = "state")
     private EventState state;
 
-    @Transient
-    private Integer confirmedRequests;
-
-    @Transient
-    private Integer views;
 }

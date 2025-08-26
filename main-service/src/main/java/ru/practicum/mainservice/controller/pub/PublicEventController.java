@@ -51,7 +51,7 @@ public class PublicEventController {
 
         Event event = eventService.findEventById(id);
         log.info("Событие загружено: id={}, название='{}', статус={}, просмотры={}",
-                event.getId(), event.getTitle(), event.getState(), event.getViews());
+                event.getId(), event.getTitle(), event.getState(), event.getCachedViews());
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
             log.error("Событие не опубликовано! id={}, статус={}", event.getId(), event.getState());

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class CompilationDto {
+
     private int id;
 
     private String title;
@@ -21,4 +22,5 @@ public class CompilationDto {
     private Boolean pinned;
 
     private List<EventShortDto> events = new ArrayList<>();
+
 }

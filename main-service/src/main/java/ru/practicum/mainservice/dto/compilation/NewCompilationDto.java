@@ -24,4 +24,5 @@ public class NewCompilationDto {
     private String title;
 
     private List<Integer> events = new ArrayList<>();
+
 }

@@ -21,8 +21,8 @@ public class EventMapper {
         result.setEventDate(event.getEventDate());
         result.setPaid(event.getPaid());
         result.setParticipantLimit(event.getParticipantLimit() != null ? event.getParticipantLimit() : 0);
-        result.setConfirmedRequests(event.getConfirmedRequests() != null ? event.getConfirmedRequests() : 0);
-        result.setViews(event.getViews() != null ? event.getViews() : 0);
+        result.setConfirmedRequests(event.getCachedConfirmedRequests() != null ? event.getCachedConfirmedRequests() : 0);
+        result.setViews(event.getCachedViews() != null ? event.getCachedViews() : 0);
         return result;
     }
 
@@ -42,8 +42,8 @@ public class EventMapper {
         result.setPaid(event.getPaid());
         result.setPublishedOn(event.getPublishedOn());
         result.setTitle(event.getTitle());
-        result.setConfirmedRequests(event.getConfirmedRequests() != null ? event.getConfirmedRequests() : 0);
-        result.setViews(event.getViews() != null ? event.getViews() : 0);
+        result.setConfirmedRequests(event.getCachedConfirmedRequests() != null ? event.getCachedConfirmedRequests() : 0);
+        result.setViews(event.getCachedViews() != null ? event.getCachedViews() : 0);
         return result;
     }
 
@@ -60,8 +60,8 @@ public class EventMapper {
         result.setRequestModeration(newDto.getRequestModeration() != null ? newDto.getRequestModeration() : true);
         result.setState(EventState.PENDING);
         result.setTitle(newDto.getTitle());
-        result.setConfirmedRequests(0);
-        result.setViews(0);
+        result.setCachedConfirmedRequests(0);
+        result.setCachedViews(0);
         return result;
     }
 }

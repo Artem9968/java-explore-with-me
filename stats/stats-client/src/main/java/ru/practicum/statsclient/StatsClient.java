@@ -19,32 +19,34 @@ import java.util.Map;
 @Slf4j
 @Component
 public class StatsClient extends BaseClient {
-    private static final String PREFIX_HIT = "/hit";
-    private static final String PREFIX_STATS = "/stats";
-    private static final String PREFIX_EVENTS = "/events/";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final String serverUrl;
+    private final String statsBaseUrl;
 
-    @Autowired
-    public StatsClient(@Value("${statserver.url}") String serverUrl, RestTemplateBuilder builder) {
+    private  final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private final String statsEndpoint = "/stats";
+    private final String eventsPrefix = "/events/";
+    private final String hitEndpoint = "/hit";
+
+        @Autowired
+    public StatsClient(@Value("${statserver.url}") String statsBaseUrl, RestTemplateBuilder builder) {
         super(builder.build());
-        this.serverUrl = serverUrl;
+        this.statsBaseUrl = statsBaseUrl;
     }
 
     public void post(HitDto dto) {
         try {
-            makeAndSendRequest(HttpMethod.POST, serverUrl + PREFIX_HIT, null, dto);
+            makeAndSendRequest(HttpMethod.POST, statsBaseUrl + hitEndpoint, null, dto);
         } catch (Exception e) {
-            log.error("Error sending hit to stats-service: {}", e.getMessage());
+            log.error("Ошибка отправки hit в сервис статистики: {}", e.getMessage());
         }
     }
 
     public ResponseEntity<Object> get(Map<String, Object> parameters) {
         try {
-            return makeAndSendRequest(HttpMethod.GET, serverUrl + PREFIX_STATS, parameters, null);
+            return makeAndSendRequest(HttpMethod.GET, statsBaseUrl + statsEndpoint, parameters, null);
         } catch (Exception e) {
-            log.error("Error getting stats from stats-service: {}", e.getMessage());
+            log.error("Ошибка получения статистики: {}", e.getMessage());
             return ResponseEntity.ok(List.of());
         }
     }
@@ -60,18 +62,17 @@ public class StatsClient extends BaseClient {
 
     public Integer getEventViews(Integer eventId, Boolean unique) {
         try {
-
             LocalDateTime start = LocalDateTime.now().minusYears(1); // 1 год назад
             LocalDateTime end = LocalDateTime.now().plusDays(1);     // 1 день вперед
 
             Map<String, Object> parameters = Map.of(
-                    "start", start.format(FORMATTER),
-                    "end", end.format(FORMATTER),
-                    "uris", PREFIX_EVENTS + eventId,
+                    "start", start.format(formatter),
+                    "end", end.format(formatter),
+                    "uris", eventsPrefix + eventId,
                     "unique", unique
             );
 
-            List<StatsDto> dtos = getList(serverUrl + PREFIX_STATS, parameters,
+            List<StatsDto> dtos = getList(statsBaseUrl + statsEndpoint, parameters,
                     new ParameterizedTypeReference<List<StatsDto>>() {});
 
             if (dtos == null || dtos.isEmpty()) {
@@ -79,7 +80,7 @@ public class StatsClient extends BaseClient {
             }
             return dtos.get(0).getHits();
         } catch (Exception e) {
-            log.error("Error getting views for event {}: {}", eventId, e.getMessage());
+            log.error("Ошибка получения просмотров для события {}: {}", eventId, e.getMessage());
             return 0;
         }
     }
@@ -90,23 +91,22 @@ public class StatsClient extends BaseClient {
                 return List.of();
             }
 
-
             LocalDateTime start = LocalDateTime.now().minusYears(1);
             LocalDateTime end = LocalDateTime.now().plusDays(1);
 
             Map<String, Object> parameters = Map.of(
-                    "start", start.format(FORMATTER),
-                    "end", end.format(FORMATTER),
+                    "start", start.format(formatter),
+                    "end", end.format(formatter),
                     "uris", String.join(",", eventUris),
                     "unique", unique
             );
 
-            List<StatsDto> result = getList(serverUrl + PREFIX_STATS, parameters,
+            List<StatsDto> result = getList(statsBaseUrl + statsEndpoint, parameters,
                     new ParameterizedTypeReference<List<StatsDto>>() {});
 
             return result != null ? result : List.of();
         } catch (Exception e) {
-            log.error("Error getting views for uris {}: {}", eventUris, e.getMessage());
+            log.error("Ошибка получения просмотров для URIs {}: {}", eventUris, e.getMessage());
             return List.of();
         }
     }

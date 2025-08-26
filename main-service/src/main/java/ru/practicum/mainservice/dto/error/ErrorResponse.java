@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ApiError {
+public class ErrorResponse {
 
     private HttpStatus status;
 
@@ -25,5 +25,6 @@ public class ApiError {
     private LocalDateTime timestamp;
 
     @JsonIgnore
-    private List<String> errors = new ArrayList<>();
+    private List<String> errorMessages = new ArrayList<>();
+
 }

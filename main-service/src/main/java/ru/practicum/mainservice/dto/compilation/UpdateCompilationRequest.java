@@ -13,10 +13,12 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class UpdateCompilationRequest {
+
     private Boolean pinned;
 
     @Size(min = 2, max = 50)
     private String title;
 
     private List<Integer> events = new ArrayList<>();
+
 }

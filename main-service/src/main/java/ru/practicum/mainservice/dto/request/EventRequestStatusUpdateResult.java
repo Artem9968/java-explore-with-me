@@ -13,7 +13,9 @@ import java.util.ArrayList;
 @ToString
 @Setter
 public class EventRequestStatusUpdateResult {
-    List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
 
-    List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+   private List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+
+  private   List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+
 }

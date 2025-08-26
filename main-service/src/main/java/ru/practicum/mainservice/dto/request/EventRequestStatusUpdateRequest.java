@@ -13,7 +13,9 @@ import java.util.ArrayList;
 @ToString
 @Setter
 public class EventRequestStatusUpdateRequest {
-    List<Integer> requestIds = new ArrayList<>();
 
-    RequestStatus status;
+  private   List<Integer> requestIds = new ArrayList<>();
+
+   private RequestStatus status;
+
 }

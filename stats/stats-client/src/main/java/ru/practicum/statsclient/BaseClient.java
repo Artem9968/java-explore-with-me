@@ -27,8 +27,7 @@ public class BaseClient {
             return response;
         }
 
-
-        log.warn("Stats service returned error status: {}", response.getStatusCode());
+        log.warn("Сервис статистики вернул ошибку: {}", response.getStatusCode());
         return ResponseEntity.ok(Collections.emptyList());
     }
 
@@ -42,12 +41,10 @@ public class BaseClient {
             ResponseEntity<Object> serverResponse = rest.exchange(uri, method, requestEntity, Object.class);
             return prepareClientResponse(serverResponse);
         } catch (HttpStatusCodeException e) {
-
-            log.error("Stats service error {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            log.error("Ошибка сервиса статистики {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
             return ResponseEntity.ok(Collections.emptyList());
         } catch (Exception e) {
-
-            log.error("Error communicating with stats-service: {}", e.getMessage());
+            log.error("Ошибка связи с сервисом статистики: {}", e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
@@ -58,21 +55,20 @@ public class BaseClient {
             URI uri = buildUri(fullUrl, parameters);
             ResponseEntity<List<T>> response = rest.exchange(uri, HttpMethod.GET, null, typeReference);
 
-
             if (response.getStatusCode().is2xxSuccessful()) {
                 List<T> body = response.getBody();
                 if (body != null) {
                     return body;
                 } else {
-                    log.warn("Stats service returned null body for URL: {}", fullUrl);
+                    log.warn("Сервис статистики вернул пустой ответ для URL: {}", fullUrl);
                     return Collections.emptyList();
                 }
             } else {
-                log.warn("Stats service returned error {} for URL: {}", response.getStatusCode(), fullUrl);
+                log.warn("Сервис статистики вернул ошибку {} для URL: {}", response.getStatusCode(), fullUrl);
                 return Collections.emptyList();
             }
         } catch (Exception e) {
-            log.error("Error getting list from stats-service for URL {}: {}", fullUrl, e.getMessage());
+            log.error("Ошибка получения списка из сервиса статистики для URL {}: {}", fullUrl, e.getMessage());
             return Collections.emptyList();
         }
     }

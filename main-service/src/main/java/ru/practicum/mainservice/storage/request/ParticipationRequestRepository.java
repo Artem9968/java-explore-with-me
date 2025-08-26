@@ -8,6 +8,7 @@ import ru.practicum.mainservice.model.event.EventConfirmedRequestCount;
 import ru.practicum.mainservice.model.request.ParticipationRequest;
 
 public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, Integer> {
+
     List<ParticipationRequest> findAllByRequester_Id(int userId);
 
     List<ParticipationRequest> findAllByEvent_Id(int eventId);
@@ -19,4 +20,5 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
             "FROM ParticipationRequest r WHERE r.event.id IN (:ids) AND r.status = 'CONFIRMED' " +
             "GROUP BY r.event.id")
     List<EventConfirmedRequestCount> countConfirmedByEventIdIn(@Param("ids") List<Integer> ids);
+
 }

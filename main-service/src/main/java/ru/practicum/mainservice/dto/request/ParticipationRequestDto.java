@@ -15,6 +15,7 @@ import ru.practicum.mainservice.model.enums.RequestStatus;
 @ToString
 @Setter
 public class ParticipationRequestDto {
+
     private Integer id;
 
     private Integer requester;
@@ -25,4 +26,5 @@ public class ParticipationRequestDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+
 }

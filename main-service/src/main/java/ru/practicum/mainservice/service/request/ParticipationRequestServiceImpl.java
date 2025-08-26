@@ -49,7 +49,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (!participationRequest.getRequester().getId().equals(userId)) {
             throw new ValidationException(
                     "Ошибка: пользователь id=" + userId +
-                            " не может отменить чужую заявку (принадлежит id=" + participationRequest.getRequester().getId() + ")"
+                            " не может отменить чужую заявку" + participationRequest.getRequester().getId()
             );
         }
 
@@ -90,7 +90,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                             "Текущее состояние: " + event.getState()
             );
         }
-        Integer confirmed = event.getConfirmedRequests();
+        Integer confirmed = event.getCachedConfirmedRequests();
         if (confirmed != null && event.getParticipantLimit() > 0
                 && confirmed.equals(event.getParticipantLimit())) {
             throw new ConflictException(
@@ -155,7 +155,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             if (!participationRequest.getStatus().equals(RequestStatus.PENDING)) {
                 throw new ConflictException(
                         "Ошибка: изменить можно только заявки в ожидании. " +
-                                "id=" + reqId + ", текущий статус: " + participationRequest.getStatus()
+                                " текущий статус: " + participationRequest.getStatus()
                 );
             }
 

@@ -53,7 +53,9 @@ public class EventServiceImpl implements EventService {
     private final ParticipationRequestRepository participationRequestRepository;
     private final EventRepository eventRepository;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private final Integer hoursEventDelay = 2;
+
+    private final Integer hoursEventDelay = 2;   // дата и время на которые намечено событие не может быть раньше, чем
+                                                 // через два часа от текущего момента
 
     private Event findEventOrThrow(Integer eventId) {
         return eventRepository.findById(eventId)
@@ -63,8 +65,8 @@ public class EventServiceImpl implements EventService {
     private void validateEventDate(LocalDateTime eventDate, String fieldName) {
         if (eventDate.isBefore(LocalDateTime.now().plusHours(hoursEventDelay))) {
             throw new ValidationException(
-                    "Field: " + fieldName + ". Error: не может быть раньше, чем через "
-                            + hoursEventDelay + " часа от текущего момента. Value: "
+                    fieldName + ". Ошибка: событие не может быть раньше, чем через "
+                            + hoursEventDelay + " часа от текущего момента "
                             + eventDate.format(dateTimeFormatter)
             );
         }
@@ -84,21 +86,21 @@ public class EventServiceImpl implements EventService {
     private void validateDateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new BadRequestException(
-                    "Parameter: rangeStart, rangeEnd. Error: Введен некорректный интервал времени."
-                            + " Value: " + startDate.format(dateTimeFormatter)
+                    "Введен некорректный интервал времени."
+                             + startDate.format(dateTimeFormatter)
                             + ", " + endDate.format(dateTimeFormatter)
             );
         }
     }
 
-    private void updateEventViewsAndRequests(Event event) {
+    private void getEventStats(Event event) {
         Integer confirmedRequests = participationRequestRepository.countConfirmedByEventId(event.getId());
         Integer views = statsClient.getEventViews(event.getId(), true);
-        event.setConfirmedRequests(confirmedRequests);
-        event.setViews(views);
+        event.setCachedConfirmedRequests(confirmedRequests);
+        event.setCachedViews(views);
     }
 
-    private void updateEventsViewsAndRequests(List<Event> events) {
+    private void getEventsStats(List<Event> events) {
         TreeMap<Integer, Event> eventMap = new TreeMap<>();
         List<String> eventUris = new ArrayList<>();
 
@@ -111,7 +113,7 @@ public class EventServiceImpl implements EventService {
         for (EventConfirmedRequestCount count : counts) {
             Event event = eventMap.get(count.getEventId());
             if (event != null) {
-                event.setConfirmedRequests(count.getConfirmedRequestCount().intValue());
+                event.setCachedConfirmedRequests(count.getConfirmedRequestCount().intValue());
             }
         }
 
@@ -121,36 +123,36 @@ public class EventServiceImpl implements EventService {
                 Integer eventId = Integer.parseInt(stat.getUri().split("/")[2]);
                 Event event = eventMap.get(eventId);
                 if (event != null) {
-                    event.setViews(stat.getHits());
+                    event.setCachedViews(stat.getHits());
                 }
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                log.warn("Не удалось распарсить URI: {}", stat.getUri());
+                log.warn("Некорректный URI: {}", stat.getUri());
             }
         }
     }
 
     private Specification<Event> buildSearchSpecification(String text, List<Integer> categories, Boolean paid,
                                                           LocalDateTime startDate, LocalDateTime endDate) {
-        Specification<Event> spec = Specification.where(null);
+        Specification<Event> searchSpec  = Specification.where(null);
 
         if (text != null) {
-            spec = spec.and(EventSpecification.hasAnnotationWithText(text)
+            searchSpec  = searchSpec .and(EventSpecification.hasAnnotationWithText(text)
                     .or(EventSpecification.hasDescriptionWithText(text)));
         }
         if (categories != null) {
-            spec = spec.and(EventSpecification.hasCategoryIn(categories));
+            searchSpec  = searchSpec .and(EventSpecification.hasCategoryIn(categories));
         }
         if (paid != null) {
-            spec = spec.and(EventSpecification.hasPaid(paid));
+            searchSpec  = searchSpec .and(EventSpecification.hasPaid(paid));
         }
         if (startDate != null) {
-            spec = spec.and(EventSpecification.withEventDateAfter(startDate));
+            searchSpec  = searchSpec .and(EventSpecification.withEventDateAfter(startDate));
         }
         if (endDate != null) {
-            spec = spec.and(EventSpecification.withEventDateBefore(endDate));
+            searchSpec  = searchSpec .and(EventSpecification.withEventDateBefore(endDate));
         }
 
-        return spec;
+        return searchSpec ;
     }
 
     private Specification<Event> buildAdminSpecification(List<String> states, List<Integer> users,
@@ -181,7 +183,7 @@ public class EventServiceImpl implements EventService {
     public List<Event> findEventsByIdIn(List<Integer> eventIds) {
         List<Event> events = eventRepository.findByIdIn(eventIds);
         if (!events.isEmpty()) {
-            updateEventsViewsAndRequests(events);
+            getEventsStats(events);
         }
         return events;
     }
@@ -200,7 +202,7 @@ public class EventServiceImpl implements EventService {
             return List.of();
         }
 
-        updateEventsViewsAndRequests(events);
+        getEventsStats(events);
         return events.stream()
                 .map(EventMapper::toFullDto)
                 .skip(from)
@@ -227,11 +229,11 @@ public class EventServiceImpl implements EventService {
             return List.of();
         }
 
-        updateEventsViewsAndRequests(events);
+        getEventsStats(events);
 
         List<EventShortDto> eventDtos = events.stream()
                 .filter(event -> !onlyAvailable || event.getParticipantLimit() == 0 ||
-                        event.getConfirmedRequests() < event.getParticipantLimit())
+                        event.getCachedConfirmedRequests() < event.getParticipantLimit())
                 .map(EventMapper::toShortDto)
                 .toList();
 
@@ -249,8 +251,8 @@ public class EventServiceImpl implements EventService {
     public Event findEventById(Integer eventId) {
         log.info("Поиск события по ID: {}", eventId);
         Event event = findEventOrThrow(eventId);
-        updateEventViewsAndRequests(event);
-        log.info("Событие найдено: ID={}, просмотры={}", eventId, event.getViews());
+        getEventStats(event);
+        log.info("Событие найдено: ID={}, просмотры={}", eventId, event.getCachedViews());
         return event;
     }
 
@@ -266,7 +268,7 @@ public class EventServiceImpl implements EventService {
         handleAdminStateAction(event, eventDto.getStateAction(), eventId);
 
         Event savedEvent = eventRepository.save(event);
-        updateEventViewsAndRequests(savedEvent);
+        getEventStats(savedEvent);
         return EventMapper.toFullDto(savedEvent);
     }
 
@@ -288,7 +290,7 @@ public class EventServiceImpl implements EventService {
         handleUserStateAction(event, eventDto.getStateAction());
 
         Event savedEvent = eventRepository.save(event);
-        updateEventViewsAndRequests(savedEvent);
+        getEventStats(savedEvent);
         return EventMapper.toFullDto(savedEvent);
     }
 
@@ -368,7 +370,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> findUserEvents(Integer userId, Integer from, Integer size) {
         List<Event> events = eventRepository.findByInitiatorId(userId);
-        updateEventsViewsAndRequests(events);
+        getEventsStats(events);
         return events.stream()
                 .skip(from)
                 .limit(size)
@@ -382,7 +384,7 @@ public class EventServiceImpl implements EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ValidationException("Пользователь не является инициатором события");
         }
-        updateEventViewsAndRequests(event);
+        getEventStats(event);
         return EventMapper.toFullDto(event);
     }
 

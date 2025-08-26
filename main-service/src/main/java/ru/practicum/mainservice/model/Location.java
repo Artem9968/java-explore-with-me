@@ -1,17 +1,18 @@
 package ru.practicum.mainservice.model;
 
+import lombok.Setter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Coordinates {
+@Setter
+public class Location {
 
-    private Float longitude;
+    private Float lat;
 
-    private Float latitude;
+    private Float lon;
+
 }

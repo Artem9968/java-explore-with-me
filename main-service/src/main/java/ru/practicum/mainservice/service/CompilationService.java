@@ -1,19 +1,19 @@
 package ru.practicum.mainservice.service;
 
-import ru.practicum.mainservice.dto.EventCollectionResponse;
-import ru.practicum.mainservice.dto.EventCollectionCreateRequest;
-import ru.practicum.mainservice.dto.EventCollectionUpdateRequest;
+import ru.practicum.mainservice.dto.CompilationDto;
+import ru.practicum.mainservice.dto.NewCompilationDto;
+import ru.practicum.mainservice.dto.PatchCompilationDto;
 
 import java.util.List;
 
 public interface CompilationService {
-    EventCollectionResponse createCompilation(EventCollectionCreateRequest compilationDto);
+    CompilationDto createCompilation(NewCompilationDto compilationDto);
 
-    EventCollectionResponse patchCompilation(Integer compId, EventCollectionUpdateRequest compilationDto);
+    CompilationDto patchCompilation(Integer compId, PatchCompilationDto compilationDto);
 
     void deleteCompilation(Integer compId);
 
-    List<EventCollectionResponse> getCompilations(Boolean pinned, Integer from, Integer size);
+    List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size);
 
-    EventCollectionResponse getCompilation(Integer compId);
+    CompilationDto getCompilation(Integer compId);
 }

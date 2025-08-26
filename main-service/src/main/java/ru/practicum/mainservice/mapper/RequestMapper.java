@@ -1,19 +1,19 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.dto.ParticipationRequestResponse;
-import ru.practicum.mainservice.model.EventRequest;
+import ru.practicum.mainservice.dto.RequestDto;
+import ru.practicum.mainservice.model.Request;
 
 public class RequestMapper {
     private RequestMapper() {
     }
 
-    public static ParticipationRequestResponse toRequestDto(EventRequest eventRequest) {
-        ParticipationRequestResponse participationRequestResponse = new ParticipationRequestResponse();
-        participationRequestResponse.setId(eventRequest.getId());
-        participationRequestResponse.setCreationDate(eventRequest.getRequestDate());
-        participationRequestResponse.setEventId(eventRequest.getEvent().getId());
-        participationRequestResponse.setRequesterId(eventRequest.getRequestingUser().getId());
-        participationRequestResponse.setStatus(eventRequest.getRequestState());
-        return participationRequestResponse;
+    public static RequestDto toRequestDto(Request request) {
+        RequestDto requestDto = new RequestDto();
+        requestDto.setId(request.getId());
+        requestDto.setCreated(request.getCreated());
+        requestDto.setEvent(request.getEvent().getId());
+        requestDto.setRequester(request.getRequester().getId());
+        requestDto.setStatus(request.getStatus());
+        return requestDto;
     }
 }

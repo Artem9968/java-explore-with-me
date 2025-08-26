@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.CategoryResponse;
-import ru.practicum.mainservice.dto.EventCollectionResponse;
+import ru.practicum.mainservice.dto.CategoryDto;
+import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.model.enums.EventStatus;
+import ru.practicum.mainservice.model.enums.EventState;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CategoryMapper;
 import ru.practicum.mainservice.mapper.EventMapper;
@@ -58,18 +58,18 @@ public class PublicController {
         log.info("🔍🔍🔍 Вызываем eventService.findEventById(id={})", id);
         Event event = eventService.findEventById(id);
         log.info("📊📊📊 После загрузки из eventService: eventId={}, title='{}', state={}, views={}",
-                event.getId(), event.getTitle(), event.getState(), event.getViewCount());
+                event.getId(), event.getTitle(), event.getState(), event.getViews());
 
         // 3. Проверка статуса
-        if (!event.getState().equals(EventStatus.ACTIVE)) {
+        if (!event.getState().equals(EventState.PUBLISHED)) {
             log.error("❌❌❌ Event не опубликован! id={}, state={}", event.getId(), event.getState());
             throw new NotFoundException("Среди опубликованных не найдено событие id=" + id);
         }
 
         // 4. Перед возвратом клиенту
-        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViewCount());
+        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViews());
         EventFullDto dto = EventMapper.toFullDto(event);
-        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViewCount());
+        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViews());
 
         return dto;
     }
@@ -100,7 +100,7 @@ public class PublicController {
 
     @GetMapping("/compilations")
     @ResponseStatus(HttpStatus.OK)
-    public List<EventCollectionResponse> findAllCompilations(
+    public List<CompilationDto> findAllCompilations(
             @RequestParam(name = "pinned", required = false) Boolean pinned,
             @RequestParam(name = "from", defaultValue = "0") Integer from,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
@@ -110,15 +110,15 @@ public class PublicController {
 
     @GetMapping("/compilations/{compId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventCollectionResponse findCompilationById(@PathVariable("compId") int compId) {
+    public CompilationDto findCompilationById(@PathVariable("compId") int compId) {
         log.info("Пользователь запрашивает подборку id={}.", compId);
         return compilationService.getCompilation(compId);
     }
 
     @GetMapping("/categories")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryResponse> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                 @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public List<CategoryDto> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
+                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь запрашивает список категорий.");
         return categoryService.getAllCategories().stream()
                 .map(CategoryMapper::toDto)
@@ -128,7 +128,7 @@ public class PublicController {
 
     @GetMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryResponse findCategoryById(@PathVariable("catId") int catId) {
+    public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
         log.info("Пользователь запрашивает категорию id={}.", catId);
         return CategoryMapper.toDto(categoryService.getCategoryById(catId));
     }

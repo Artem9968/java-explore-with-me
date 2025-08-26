@@ -2,10 +2,10 @@ package ru.practicum.mainservice.mapper;
 
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.EventCreateRequest;
-import ru.practicum.mainservice.model.enums.EventStatus;
+import ru.practicum.mainservice.dto.NewEventDto;
+import ru.practicum.mainservice.model.enums.EventState;
 import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.Coordinates;
+import ru.practicum.mainservice.model.Location;
 
 import java.time.LocalDateTime;
 
@@ -13,30 +13,30 @@ public class EventMapper {
     private EventMapper() {
     }
 
-    public static Event toEvent(final EventCreateRequest newDto) {
+    public static Event toEvent(final NewEventDto newDto) {
         Event event = new Event();
         event.setAnnotation(newDto.getAnnotation());
         event.setDescription(newDto.getDescription());
-        event.setScheduledTime(newDto.getEventDate());
-        event.setCreationTimestamp(LocalDateTime.now());
-        event.setLatitude(newDto.getLocation().getLatitude());
-        event.setLongitude(newDto.getLocation().getLongitude());
-        event.setIsPaid(false);
-        if (newDto.getIsPaid() != null) {
-            event.setIsPaid(newDto.getIsPaid());
+        event.setEventDate(newDto.getEventDate());
+        event.setCreatedOn(LocalDateTime.now());
+        event.setLat(newDto.getLocation().getLat());
+        event.setLon(newDto.getLocation().getLon());
+        event.setPaid(false);
+        if (newDto.getPaid() != null) {
+            event.setPaid(newDto.getPaid());
         }
-        event.setMaxAttendees(0);
-        if (newDto.getMaxAttendees() != null) {
-            event.setMaxAttendees(newDto.getMaxAttendees());
+        event.setParticipantLimit(0);
+        if (newDto.getParticipantLimit() != null) {
+            event.setParticipantLimit(newDto.getParticipantLimit());
         }
-        event.setRequiresApproval(true);
-        if (newDto.getRequiresApproval() != null) {
-            event.setRequiresApproval(newDto.getRequiresApproval());
+        event.setRequestModeration(true);
+        if (newDto.getRequestModeration() != null) {
+            event.setRequestModeration(newDto.getRequestModeration());
         }
-        event.setState(EventStatus.IN_MODERATION);
+        event.setState(EventState.PENDING);
         event.setTitle(newDto.getTitle());
-        event.setApprovedParticipants(0);
-        event.setViewCount(0);
+        event.setConfirmedRequests(0);
+        event.setViews(0);
         return event;
     }
 
@@ -45,27 +45,27 @@ public class EventMapper {
         dto.setId(event.getId());
         dto.setAnnotation(event.getAnnotation());
         dto.setDescription(event.getDescription());
-        dto.setEventDate(event.getScheduledTime());
-        dto.setCreationTimestamp(event.getCreationTimestamp());
+        dto.setEventDate(event.getEventDate());
+        dto.setCreatedOn(event.getCreatedOn());
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
-        dto.setOrganizer(UserMapper.toUserShortDto(event.getOrganizer()));
-        dto.setLocation(new Coordinates(event.getLatitude(), event.getLongitude()));
-        dto.setMaxAttendees(0);
-        if (event.getMaxAttendees() != null) {
-            dto.setMaxAttendees(event.getMaxAttendees());
+        dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
+        dto.setLocation(new Location(event.getLat(), event.getLon()));
+        dto.setParticipantLimit(0);
+        if (event.getParticipantLimit() != null) {
+            dto.setParticipantLimit(event.getParticipantLimit());
         }
-        dto.setRequiresApproval(event.getRequiresApproval());
-        dto.setEventStatus(event.getState());
-        dto.setIsPaid(event.getIsPaid());
-        dto.setPublicationTime(event.getPublicationTime());
+        dto.setRequestModeration(event.getRequestModeration());
+        dto.setState(event.getState());
+        dto.setPaid(event.getPaid());
+        dto.setPublishedOn(event.getPublishedOn());
         dto.setTitle(event.getTitle());
-        dto.setApprovedParticipantsCount(0);
-        if (event.getApprovedParticipants() != null) {
-            dto.setApprovedParticipantsCount(event.getApprovedParticipants());
+        dto.setConfirmedRequests(0);
+        if (event.getConfirmedRequests() != null) {
+            dto.setConfirmedRequests(event.getConfirmedRequests());
         }
-        dto.setViewCount(0);
-        if (event.getViewCount() != null) {
-            dto.setViewCount(event.getViewCount());
+        dto.setViews(0);
+        if (event.getViews() != null) {
+            dto.setViews(event.getViews());
         }
         return dto;
     }
@@ -76,20 +76,20 @@ public class EventMapper {
         dto.setTitle(event.getTitle());
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(CategoryMapper.toDto(event.getCategory()));
-        dto.setOrganizer(UserMapper.toUserShortDto(event.getOrganizer()));
-        dto.setEventDate(event.getScheduledTime());
-        dto.setIsPaid(event.getIsPaid());
-        dto.setMaxAttendees(0);
-        if (event.getMaxAttendees() != null) {
-            dto.setMaxAttendees(event.getMaxAttendees());
+        dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
+        dto.setEventDate(event.getEventDate());
+        dto.setPaid(event.getPaid());
+        dto.setParticipantLimit(0);
+        if (event.getParticipantLimit() != null) {
+            dto.setParticipantLimit(event.getParticipantLimit());
         }
-        dto.setApprovedParticipantsCount(0);
-        if (event.getApprovedParticipants() != null) {
-            dto.setApprovedParticipantsCount(event.getApprovedParticipants());
+        dto.setConfirmedRequests(0);
+        if (event.getConfirmedRequests() != null) {
+            dto.setConfirmedRequests(event.getConfirmedRequests());
         }
-        dto.setViewCount(0);
-        if (event.getViewCount() != null) {
-            dto.setViewCount(event.getViewCount());
+        dto.setViews(0);
+        if (event.getViews() != null) {
+            dto.setViews(event.getViews());
         }
         return dto;
     }

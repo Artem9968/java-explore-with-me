@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.UserResponse;
+import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.mapper.UserMapper;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.service.UserService;
@@ -29,7 +29,7 @@ public class AdminUsersController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<UserResponse> getUsers(
+    public List<UserDto> getUsers(
             @RequestParam(name = "ids", required = false) List<Integer> ids,
             @RequestParam(name = "from", defaultValue = "0") Integer from,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
@@ -49,7 +49,7 @@ public class AdminUsersController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponse getUser(@PathVariable Integer id) {
+    public UserDto getUser(@PathVariable Integer id) {
         log.info("Выполняем поиск пользователя id={}.", id);
         User user = userService.getUserById(id);
         return UserMapper.toUserDto(user);
@@ -57,9 +57,9 @@ public class AdminUsersController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse createUser(@Validated @RequestBody UserResponse userResponse) {
-        log.info("Создаем нового пользователя {}", userResponse.toString());
-        User savedUser = userService.addUser(UserMapper.toUser(userResponse));
+    public UserDto createUser(@Validated @RequestBody UserDto userDto) {
+        log.info("Создаем нового пользователя {}", userDto.toString());
+        User savedUser = userService.addUser(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(savedUser);
     }
 

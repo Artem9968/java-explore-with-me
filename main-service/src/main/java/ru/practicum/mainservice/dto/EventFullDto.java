@@ -1,52 +1,51 @@
 package ru.practicum.mainservice.dto;
 
-import lombok.Getter;
 import lombok.Setter;
-import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Size;
-import ru.practicum.mainservice.model.enums.EventStatus;
-import ru.practicum.mainservice.model.Coordinates;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import ru.practicum.mainservice.model.Location;
+import lombok.NoArgsConstructor;
+import ru.practicum.mainservice.model.enums.EventState;
+import jakarta.validation.constraints.Size;
 
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class EventFullDto {
+    private Integer id;
 
-    private Integer viewCount;
-
-    @Size(min = 3, max = 120, message = "Заголовок должен содержать от 3 до 120 символов")
+    @Size(min = 3, max = 120)
     private String title;
 
-    private EventStatus eventStatus;
+    private String annotation;
 
-    private Boolean requiresApproval;
+    private String description;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime publicationTime;
+    private CategoryDto category;
 
-    private Integer maxAttendees;
+    private UserShortDto initiator;
 
-    private Boolean isPaid;
+    private Location location;
 
-    private Coordinates location;
+    private Boolean paid;
 
-    private UserShortDto organizer;
+    private Integer participantLimit;
 
-    private Integer id;
+    private Boolean requestModeration;
+
+    private EventState state;
+
+    private Integer confirmedRequests;
+
+    private Integer views;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime creationTimestamp;
-
-    private Integer approvedParticipantsCount;
-
-    private CategoryResponse category;
-
-    private String annotation;
+    private LocalDateTime publishedOn;
 }

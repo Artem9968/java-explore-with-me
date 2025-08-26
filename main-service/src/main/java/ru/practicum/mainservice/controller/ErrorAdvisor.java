@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.mainservice.dto.ErrorResponse;
+import ru.practicum.mainservice.dto.ApiError;
 import ru.practicum.mainservice.exception.*;
 
 import java.time.LocalDateTime;
@@ -23,79 +23,79 @@ import java.util.List;
 public class ErrorAdvisor {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse onHandlerMethodValidationException(BadRequestException e) {
+    public ApiError onHandlerMethodValidationException(BadRequestException e) {
         log.error("400 {}.", e.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST);
-        errorResponse.setErrorType("Запрос составлен некорректно.");
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setReason("Запрос составлен некорректно.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundObject(NotFoundException exception) {
+    public ApiError notFoundObject(NotFoundException exception) {
         log.error("404 {}.", exception.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.NOT_FOUND);
-        errorResponse.setErrorType("Запрошенный объект не найден.");
-        errorResponse.setMessage(exception.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.NOT_FOUND);
+        apiError.setReason("Запрошенный объект не найден.");
+        apiError.setMessage(exception.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse onValidationException(ValidationException exception) {
+    public ApiError onValidationException(ValidationException exception) {
         log.error("409 {}.", exception.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.FORBIDDEN);
-        errorResponse.setErrorType("Запрос содержит недопустимые данные.");
-        errorResponse.setMessage(exception.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.FORBIDDEN);
+        apiError.setReason("Запрос содержит недопустимые данные.");
+        apiError.setMessage(exception.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(InternalServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse onInternalException(final InternalServerException e) {
+    public ApiError onInternalException(final InternalServerException e) {
         log.error("500 {}", e.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        errorResponse.setErrorType("Внутренняя ошибка сервера.");
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        apiError.setReason("Внутренняя ошибка сервера.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(DataConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse onDataIntegrityViolationException(final DataConflictException e) {
+    public ApiError onDataIntegrityViolationException(final DataConflictException e) {
         log.error("409 {}", e.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.CONFLICT);
-        errorResponse.setErrorType("Конфликт данных.");
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setReason("Конфликт данных.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse onDataIntegrityViolationException(final DataIntegrityViolationException e) {
+    public ApiError onDataIntegrityViolationException(final DataIntegrityViolationException e) {
         log.error("409 {}", e.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.CONFLICT);
-        errorResponse.setErrorType(e.getRootCause().getMessage());
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setReason(e.getRootCause().getMessage());
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ApiError onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("400 {}.", e.getMessage());
         final List<String> violations = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> String.format("Field: %s. Error: %s. Value: '%s'. ",
@@ -104,17 +104,17 @@ public class ErrorAdvisor {
                         error.getRejectedValue()
                 ))
                 .toList();
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST);
-        errorResponse.setErrorType("Запрос сформирован некорректно.");
-        errorResponse.setMessage(String.join(" ", violations));
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setReason("Запрос сформирован некорректно.");
+        apiError.setMessage(String.join(" ", violations));
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse onConstraintValidationException(ConstraintViolationException e) {
+    public ApiError onConstraintValidationException(ConstraintViolationException e) {
         log.error("400 {}.", e.getMessage());
         final List<String> violations = e.getConstraintViolations().stream()
                 .map(
@@ -124,36 +124,36 @@ public class ErrorAdvisor {
                                 violation.getInvalidValue()
                         ))
                 .toList();
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST);
-        errorResponse.setErrorType("Запрос сформирован некорректно.");
-        errorResponse.setMessage(String.join(" ", violations));
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setReason("Запрос сформирован некорректно.");
+        apiError.setMessage(String.join(" ", violations));
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse onMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    public ApiError onMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.error("400 {}.", e.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST);
-        errorResponse.setErrorType("Incorrectly made request.");
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setReason("Incorrectly made request.");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException(final Exception e) {
+    public ApiError handleException(final Exception e) {
         log.error("500 INTERNAL_SERVER_ERROR", e);
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        errorResponse.setErrorType(e.getCause().getMessage());
-        errorResponse.setMessage(e.getMessage());
-        errorResponse.setTimestamp(LocalDateTime.now());
-        return errorResponse;
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        apiError.setReason(e.getCause().getMessage());
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(LocalDateTime.now());
+        return apiError;
     }
 
 }

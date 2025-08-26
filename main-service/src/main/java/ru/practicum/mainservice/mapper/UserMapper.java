@@ -1,6 +1,6 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.dto.UserResponse;
+import ru.practicum.mainservice.dto.UserDto;
 import ru.practicum.mainservice.dto.UserShortDto;
 import ru.practicum.mainservice.model.User;
 
@@ -8,21 +8,21 @@ public class UserMapper {
     private UserMapper() {
     }
 
-    public static User toUser(UserResponse dto) {
+    public static User toUser(UserDto dto) {
         User user = new User();
         if (dto.getId() != null) {
             user.setId(dto.getId());
         }
         user.setName(dto.getName());
-        user.setEmailAddress(dto.getEmailAddress());
+        user.setEmail(dto.getEmail());
         return user;
     }
 
-    public static UserResponse toUserDto(User user) {
-        UserResponse dto = new UserResponse();
+    public static UserDto toUserDto(User user) {
+        UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setName(user.getName());
-        dto.setEmailAddress(user.getEmailAddress());
+        dto.setEmail(user.getEmail());
         return dto;
     }
 

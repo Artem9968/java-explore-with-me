@@ -1,23 +1,22 @@
 package ru.practicum.mainservice.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.util.List;
 import java.util.ArrayList;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCollectionResponse {
+@Getter
+@Setter
+public class CompilationDto {
+    private int id;
 
-    private Boolean isPinned;
+    private String title;
 
-    private String collectionTitle;
+    private Boolean pinned;
 
     private List<EventShortDto> events = new ArrayList<>();
-
-    private int id;
 }

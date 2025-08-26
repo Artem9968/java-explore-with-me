@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.dto.EventCollectionResponse;
+import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.EventCollectionCreateRequest;
-import ru.practicum.mainservice.model.EventCollection;
+import ru.practicum.mainservice.dto.NewCompilationDto;
+import ru.practicum.mainservice.model.Compilation;
 
 import java.util.List;
 
@@ -11,21 +11,21 @@ public class CompilationMapper {
     private CompilationMapper() {
     }
 
-    public static EventCollection toCompilation(EventCollectionCreateRequest dto) {
-        EventCollection c = new EventCollection();
-        c.setCollectionTitle(dto.getCollectionTitle());
-        c.setIsPinned(false);
-        if (dto.getIsPinned() != null) {
-            c.setIsPinned(dto.getIsPinned());
+    public static Compilation toCompilation(NewCompilationDto dto) {
+        Compilation c = new Compilation();
+        c.setTitle(dto.getTitle());
+        c.setPinned(false);
+        if (dto.getPinned() != null) {
+            c.setPinned(dto.getPinned());
         }
         return c;
     }
 
-    public static EventCollectionResponse toCompilationDto(EventCollection c) {
-        EventCollectionResponse dto = new EventCollectionResponse();
+    public static CompilationDto toCompilationDto(Compilation c) {
+        CompilationDto dto = new CompilationDto();
         dto.setId(c.getId());
-        dto.setCollectionTitle(c.getCollectionTitle());
-        dto.setIsPinned(c.getIsPinned());
+        dto.setTitle(c.getTitle());
+        dto.setPinned(c.getPinned());
         List<EventShortDto> eventDtos = c.getEvents()
                 .stream()
                 .map(EventMapper::toShortDto)

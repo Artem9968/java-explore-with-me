@@ -1,38 +1,37 @@
 package ru.practicum.mainservice.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
+@Getter
+@ToString
+@Setter
 public class EventShortDto {
-
-    private Integer viewCount;
+    private Integer id;
 
     private String title;
 
-    private Boolean isPaid;
+    private String annotation;
 
-    private UserShortDto organizer;
+    private CategoryDto category;
+
+    private UserShortDto initiator;
+
+    private Boolean paid;
+
+    private Integer confirmedRequests;
+
+    private Integer views;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private Integer approvedParticipantsCount;
-
-    private CategoryResponse category;
-
-    private String annotation;
-
     @JsonIgnore
-    private Integer maxAttendees;
-
-    private Integer id;
+    private Integer participantLimit;
 }

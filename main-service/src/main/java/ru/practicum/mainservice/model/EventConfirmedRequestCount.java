@@ -1,17 +1,17 @@
 package ru.practicum.mainservice.model;
 
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventApprovalStats {
+@Getter
+@Setter
+public class EventConfirmedRequestCount {
 
     private Integer eventId;
 
-    private Long approvedParticipantsCount;
+    private Long confirmedRequestCount;
 }

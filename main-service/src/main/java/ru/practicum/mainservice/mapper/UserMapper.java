@@ -5,31 +5,29 @@ import ru.practicum.mainservice.dto.UserShortDto;
 import ru.practicum.mainservice.model.User;
 
 public class UserMapper {
-    private UserMapper() {
+
+    public static UserShortDto toUserShortDto(User entity) {
+        UserShortDto result = new UserShortDto();
+        result.setId(entity.getId());
+        result.setName(entity.getName());
+        return result;
     }
 
-    public static User toUser(UserDto dto) {
-        User user = new User();
-        if (dto.getId() != null) {
-            user.setId(dto.getId());
+    public static UserDto toUserDto(User entity) {
+        UserDto result = new UserDto();
+        result.setId(entity.getId());
+        result.setName(entity.getName());
+        result.setEmail(entity.getEmail());
+        return result;
+    }
+
+    public static User toUser(UserDto userDto) {
+        User result = new User();
+        if (userDto.getId() != null) {
+            result.setId(userDto.getId());
         }
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        return user;
-    }
-
-    public static UserDto toUserDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        return dto;
-    }
-
-    public static UserShortDto toUserShortDto(User user) {
-        UserShortDto dto = new UserShortDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        return dto;
+        result.setName(userDto.getName());
+        result.setEmail(userDto.getEmail());
+        return result;
     }
 }

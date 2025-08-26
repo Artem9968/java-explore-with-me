@@ -1,37 +1,33 @@
 package ru.practicum.mainservice.mapper;
 
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.model.Compilation;
+import ru.practicum.mainservice.dto.EventShortDto;
+import ru.practicum.mainservice.dto.CompilationDto;
+import ru.practicum.mainservice.dto.NewCompilationDto;
 
 import java.util.List;
 
 public class CompilationMapper {
-    private CompilationMapper() {
-    }
 
-    public static Compilation toCompilation(NewCompilationDto dto) {
-        Compilation c = new Compilation();
-        c.setTitle(dto.getTitle());
-        c.setPinned(false);
-        if (dto.getPinned() != null) {
-            c.setPinned(dto.getPinned());
-        }
-        return c;
-    }
+    public static CompilationDto toCompilationDto(Compilation compilation) {
+        CompilationDto result = new CompilationDto();
+        result.setId(compilation.getId());
+        result.setTitle(compilation.getTitle());
+        result.setPinned(compilation.getPinned());
 
-    public static CompilationDto toCompilationDto(Compilation c) {
-        CompilationDto dto = new CompilationDto();
-        dto.setId(c.getId());
-        dto.setTitle(c.getTitle());
-        dto.setPinned(c.getPinned());
-        List<EventShortDto> eventDtos = c.getEvents()
+        List<EventShortDto> shortEvents = compilation.getEvents()
                 .stream()
                 .map(EventMapper::toShortDto)
                 .toList();
-        dto.setEvents(eventDtos);
-        return dto;
+        result.setEvents(shortEvents);
+
+        return result;
     }
 
+    public static Compilation toCompilation(NewCompilationDto newDto) {
+        Compilation result = new Compilation();
+        result.setTitle(newDto.getTitle());
+        result.setPinned(newDto.getPinned() != null ? newDto.getPinned() : false);
+        return result;
+    }
 }

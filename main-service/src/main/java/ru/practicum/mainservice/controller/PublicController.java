@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +16,11 @@ import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.CompilationDto;
 import ru.practicum.mainservice.dto.EventFullDto;
 import ru.practicum.mainservice.dto.EventShortDto;
-import ru.practicum.mainservice.model.enums.EventState;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.mapper.CategoryMapper;
 import ru.practicum.mainservice.mapper.EventMapper;
 import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.model.enums.EventState;
 import ru.practicum.mainservice.service.CategoryService;
 import ru.practicum.mainservice.service.CompilationService;
 import ru.practicum.mainservice.service.EventService;
@@ -38,38 +39,27 @@ public class PublicController {
     private final CategoryService categoryService;
 
     @Value("${spring.application.name}")
-    private String appName;
+    private String applicationName;
 
     @GetMapping("/events/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto findEventById(@PathVariable("id") int id, HttpServletRequest request) {
-        log.info("🎯🎯🎯 [START] PublicController.findEventById id={}", id);
+        log.info("Запрос события по id={}", id);
 
-        String ip = request.getRemoteAddr();
-        String uri = request.getRequestURI();
-        log.info("🌐🌐🌐 Клиентский запрос: IP={}, URI={}", ip, uri);
+        statsClient.hitInfo(applicationName, request.getRequestURI(), request.getRemoteAddr());
+        log.info("Хит отправлен в stats-service");
 
-        // 1. Логируем отправку хита
-        log.info("📤📤📤 Отправляем hit -> statsClient.hitInfo(appName={}, uri={}, ip={})", appName, uri, ip);
-        statsClient.hitInfo(appName, uri, ip);
-        log.info("✅✅✅ Hit отправлен в stats-service");
-
-        // 2. Получаем событие из сервиса
-        log.info("🔍🔍🔍 Вызываем eventService.findEventById(id={})", id);
         Event event = eventService.findEventById(id);
-        log.info("📊📊📊 После загрузки из eventService: eventId={}, title='{}', state={}, views={}",
+        log.info("Событие загружено: id={}, название='{}', статус={}, просмотры={}",
                 event.getId(), event.getTitle(), event.getState(), event.getViews());
 
-        // 3. Проверка статуса
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            log.error("❌❌❌ Event не опубликован! id={}, state={}", event.getId(), event.getState());
+            log.error("Событие не опубликовано! id={}, статус={}", event.getId(), event.getState());
             throw new NotFoundException("Среди опубликованных не найдено событие id=" + id);
         }
 
-        // 4. Перед возвратом клиенту
-        log.info("📦📦📦 Готовим EventFullDto для ответа. Итоговое значение views={}", event.getViews());
         EventFullDto dto = EventMapper.toFullDto(event);
-        log.info("🎯🎯🎯 [END] PublicController.findEventById id={} -> SUCCESS (views={})", id, dto.getViews());
+        log.info("Возврат EventFullDto, просмотры={}", dto.getViews());
 
         return dto;
     }
@@ -89,10 +79,11 @@ public class PublicController {
             @RequestParam(name = "size", defaultValue = "10") Integer size,
             HttpServletRequest request) {
 
-        log.info("Пользователь запрашивает поиск событий: содержащих текст:{}, categories:{}, rangeStart:{}, rangeEnd:{}.",
+        log.info("Пользователь запрашивает события: текст='{}', категории={}, начало диапазона={}, конец диапазона={}",
                 text, categories, rangeStart, rangeEnd);
 
-        statsClient.hitInfo(appName, "/events", request.getRemoteAddr());
+        statsClient.hitInfo(applicationName, "/events", request.getRemoteAddr());
+        log.info("Хит отправлен в сервис статистики для эндпоинта /events");
 
         return eventService.findEventsByParameters(text, categories, paid, rangeStart,
                 rangeEnd, onlyAvailable, sort, from, size);
@@ -111,7 +102,7 @@ public class PublicController {
     @GetMapping("/compilations/{compId}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationDto findCompilationById(@PathVariable("compId") int compId) {
-        log.info("Пользователь запрашивает подборку id={}.", compId);
+        log.info("Пользователь запрашивает подборку id={}", compId);
         return compilationService.findCompilationById(compId);
     }
 
@@ -122,14 +113,17 @@ public class PublicController {
         log.info("Пользователь запрашивает список категорий.");
         return categoryService.findAll().stream()
                 .map(CategoryMapper::toDto)
-                .skip(from).limit(size)
+                .skip(from)
+                .limit(size)
                 .toList();
     }
 
     @GetMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
-        log.info("Пользователь запрашивает категорию id={}.", catId);
+        log.info("Пользователь запрашивает категорию id={}", catId);
         return CategoryMapper.toDto(categoryService.findById(catId));
     }
 }
+
+

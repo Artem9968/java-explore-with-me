@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,145 +16,109 @@ import ru.practicum.mainservice.exception.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Класс обработки исключений при обработке поступивших http запросов
- */
 @Slf4j
 @RestControllerAdvice
 public class ErrorAdvisor {
+
+    private ApiError buildApiError(HttpStatus status, String reason, String message) {
+        ApiError error = new ApiError();
+        error.setStatus(status);
+        error.setReason(reason);
+        error.setMessage(message);
+        error.setTimestamp(LocalDateTime.now());
+        return error;
+    }
+
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError onHandlerMethodValidationException(BadRequestException e) {
-        log.error("400 {}.", e.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setReason("Запрос составлен некорректно.");
-        apiError.setMessage(e.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleBadRequest(BadRequestException e) {
+        log.error("400 BAD_REQUEST: {}", e.getMessage());
+        return buildApiError(HttpStatus.BAD_REQUEST, "Запрос составлен некорректно.", e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError notFoundObject(NotFoundException exception) {
-        log.error("404 {}.", exception.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.NOT_FOUND);
-        apiError.setReason("Запрошенный объект не найден.");
-        apiError.setMessage(exception.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleNotFound(NotFoundException e) {
+        log.error("404 NOT_FOUND: {}", e.getMessage());
+        return buildApiError(HttpStatus.NOT_FOUND, "Запрошенный объект не найден.", e.getMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError onValidationException(ValidationException exception) {
-        log.error("409 {}.", exception.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.FORBIDDEN);
-        apiError.setReason("Запрос содержит недопустимые данные.");
-        apiError.setMessage(exception.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleValidation(ValidationException e) {
+        log.error("403 FORBIDDEN: {}", e.getMessage());
+        return buildApiError(HttpStatus.FORBIDDEN, "Запрос содержит недопустимые данные.", e.getMessage());
     }
 
     @ExceptionHandler(InternalServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError onInternalException(final InternalServerException e) {
-        log.error("500 {}", e.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        apiError.setReason("Внутренняя ошибка сервера.");
-        apiError.setMessage(e.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleInternal(InternalServerException e) {
+        log.error("500 INTERNAL_SERVER_ERROR: {}", e.getMessage());
+        return buildApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Внутренняя ошибка сервера.", e.getMessage());
     }
 
     @ExceptionHandler(DataConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError onDataIntegrityViolationException(final DataConflictException e) {
-        log.error("409 {}", e.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.CONFLICT);
-        apiError.setReason("Конфликт данных.");
-        apiError.setMessage(e.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleDataConflict(DataConflictException e) {
+        log.error("409 CONFLICT: {}", e.getMessage());
+        return buildApiError(HttpStatus.CONFLICT, "Конфликт данных.", e.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError onDataIntegrityViolationException(final DataIntegrityViolationException e) {
-        log.error("409 {}", e.getMessage());
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.CONFLICT);
-        apiError.setReason(e.getRootCause().getMessage());
-        apiError.setMessage(e.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+    public ApiError handleDataIntegrity(DataIntegrityViolationException e) {
+        log.error("409 CONFLICT: {}", e.getMessage());
+        String reason = (e.getRootCause() != null) ? e.getRootCause().getMessage() : "Нарушение целостности данных";
+        return buildApiError(HttpStatus.CONFLICT, reason, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("400 {}.", e.getMessage());
-        final List<String> violations = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> String.format("Field: %s. Error: %s. Value: '%s'. ",
-                        error.getField(),
-                        error.getDefaultMessage(),
-                        error.getRejectedValue()
-                ))
+    public ApiError handleMethodArgNotValid(MethodArgumentNotValidException e) {
+        log.error("400 BAD_REQUEST: {}", e.getMessage());
+        List<String> violations = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> String.format("Field: %s. Error: %s. Value: '%s'.",
+                        err.getField(), err.getDefaultMessage(), err.getRejectedValue()))
                 .toList();
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setReason("Запрос сформирован некорректно.");
-        apiError.setMessage(String.join(" ", violations));
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+        return buildApiError(HttpStatus.BAD_REQUEST, "Запрос сформирован некорректно.", String.join(" ", violations));
     }
 
-    @ExceptionHandler({ConstraintViolationException.class})
+    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError onConstraintValidationException(ConstraintViolationException e) {
-        log.error("400 {}.", e.getMessage());
-        final List<String> violations = e.getConstraintViolations().stream()
-                .map(
-                        violation -> String.format("Field: %s. Error: %s. Value: '%s'. ",
-                                violation.getPropertyPath().toString(),
-                                violation.getMessage(),
-                                violation.getInvalidValue()
-                        ))
+    public ApiError handleConstraintViolation(ConstraintViolationException e) {
+        log.error("400 BAD_REQUEST: {}", e.getMessage());
+        List<String> violations = e.getConstraintViolations().stream()
+                .map(v -> String.format("Field: %s. Error: %s. Value: '%s'.",
+                        v.getPropertyPath(), v.getMessage(), v.getInvalidValue()))
                 .toList();
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setReason("Запрос сформирован некорректно.");
-        apiError.setMessage(String.join(" ", violations));
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
+        return buildApiError(HttpStatus.BAD_REQUEST, "Запрос сформирован некорректно.", String.join(" ", violations));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError onMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("400 {}.", e.getMessage());
+    public ApiError handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        log.error("400 BAD_REQUEST: {}", e.getMessage());
+        return buildApiError(HttpStatus.BAD_REQUEST, "Некорректно составлен запрос.", e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleGeneric(Exception e) {
+        log.error("500 INTERNAL_SERVER_ERROR", e);
+        String reason = (e.getCause() != null) ? e.getCause().getMessage() : "Неизвестная ошибка";
+        return buildApiError(HttpStatus.INTERNAL_SERVER_ERROR, reason, e.getMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingParams(MissingServletRequestParameterException e) {
+        log.error("400 Ошибка: отсутствует обязательный параметр {}.", e.getParameterName());
         ApiError apiError = new ApiError();
         apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setReason("Incorrectly made request.");
-        apiError.setMessage(e.getMessage());
+        apiError.setReason("Отсутствует обязательный параметр запроса");
+        apiError.setMessage("Не указан параметр: " + e.getParameterName());
         apiError.setTimestamp(LocalDateTime.now());
         return apiError;
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleException(final Exception e) {
-        log.error("500 INTERNAL_SERVER_ERROR", e);
-        ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        apiError.setReason(e.getCause().getMessage());
-        apiError.setMessage(e.getMessage());
-        apiError.setTimestamp(LocalDateTime.now());
-        return apiError;
-    }
-
 }
+

@@ -94,7 +94,7 @@ public class PublicController {
 
         statsClient.hitInfo(appName, "/events", request.getRemoteAddr());
 
-        return eventService.findEventsByParametrs(text, categories, paid, rangeStart,
+        return eventService.findEventsByParameters(text, categories, paid, rangeStart,
                 rangeEnd, onlyAvailable, sort, from, size);
     }
 
@@ -105,14 +105,14 @@ public class PublicController {
             @RequestParam(name = "from", defaultValue = "0") Integer from,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь запрашивает список подборок.");
-        return compilationService.getCompilations(pinned, from, size);
+        return compilationService.findAllCompilations(pinned, from, size);
     }
 
     @GetMapping("/compilations/{compId}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationDto findCompilationById(@PathVariable("compId") int compId) {
         log.info("Пользователь запрашивает подборку id={}.", compId);
-        return compilationService.getCompilation(compId);
+        return compilationService.findCompilationById(compId);
     }
 
     @GetMapping("/categories")
@@ -120,7 +120,7 @@ public class PublicController {
     public List<CategoryDto> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
                                             @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь запрашивает список категорий.");
-        return categoryService.getAllCategories().stream()
+        return categoryService.findAll().stream()
                 .map(CategoryMapper::toDto)
                 .skip(from).limit(size)
                 .toList();
@@ -130,6 +130,6 @@ public class PublicController {
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
         log.info("Пользователь запрашивает категорию id={}.", catId);
-        return CategoryMapper.toDto(categoryService.getCategoryById(catId));
+        return CategoryMapper.toDto(categoryService.findById(catId));
     }
 }

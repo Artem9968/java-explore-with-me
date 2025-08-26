@@ -44,7 +44,7 @@ public class UserController {
 
         log.info("Пользователь id={} запрашивает информацию о событии id={}. ",
                 userId, eventId);
-        return eventService.getEventById(eventId, userId);
+        return eventService.findUserEventById(eventId, userId);
     }
 
     @GetMapping("/{userId}/events")
@@ -53,7 +53,7 @@ public class UserController {
                                          @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Пользователь id={} запрашивает информацию об инциированных событиях.", userId);
-        return eventService.getEventsByUserId(userId, from, size);
+        return eventService.findUserEvents(userId, from, size);
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
@@ -62,7 +62,7 @@ public class UserController {
                                     @PathVariable Integer eventId,
                                     @Validated @RequestBody UpdateEventUserRequest eventDto) {
         log.info("Пользователь id={} изменяет информацию об инициированном событии. {}", userId, eventDto.toString());
-        return eventService.patchEvent(eventId, eventDto, userId);
+        return eventService.updateEventByUser(eventId, eventDto, userId);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
@@ -71,7 +71,7 @@ public class UserController {
                                                   @PathVariable int eventId) {
         log.info("Пользователь id={} выполняет поиск запросов на участие в событии id={}.",
                 userId, eventId);
-        return requestService.getRequestsByEventId(userId, eventId)
+        return requestService.findEventRequests(userId, eventId)
                 .stream()
                 .map(RequestMapper::toRequestDto)
                 .toList();
@@ -84,7 +84,7 @@ public class UserController {
                                                   @RequestBody RequestUpdateDto requestUpdateDto) {
         log.info("Пользователь id={} модерирует запросы на событие id={}.",
                 userId, eventId);
-        return requestService.updateRequestsStatus(userId, eventId, requestUpdateDto);
+        return requestService.updateRequestStatuses(userId, eventId, requestUpdateDto);
     }
 
     @PostMapping("/{userId}/requests")
@@ -101,7 +101,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findRequestsByUserId(@PathVariable Integer userId) {
         log.info("Пользователь id={} выполняет поиск собственных заявок.", userId);
-        return requestService.getRequestsByUserId(userId);
+        return requestService.findUserRequests(userId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
@@ -109,6 +109,6 @@ public class UserController {
     public RequestDto canceledRequestById(@PathVariable Integer userId,
                                           @PathVariable Integer requestId) {
         log.info("Пользователь id={} отменяет запрос id={}.", userId, requestId);
-        return RequestMapper.toRequestDto(requestService.canceledRequest(userId, requestId));
+        return RequestMapper.toRequestDto(requestService.cancelRequest(userId, requestId));
     }
 }

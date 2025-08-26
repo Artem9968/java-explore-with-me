@@ -36,13 +36,13 @@ public class AdminCompilationsController {
     public CompilationDto updateCompilation(@PathVariable Integer compId,
                                             @Validated @RequestBody PatchCompilationDto compilationDto) {
         log.info("Администратор обновляет подборку событий '{}'.", compilationDto.getTitle());
-        return compilationService.patchCompilation(compId, compilationDto);
+        return compilationService.updateCompilation(compId, compilationDto);
     }
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable Integer compId) {
         log.info("Администратор удаляет подборку событий id={}.", compId);
-        compilationService.deleteCompilation(compId);
+        compilationService.removeCompilation(compId);
     }
 }

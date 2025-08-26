@@ -36,9 +36,9 @@ public class AdminUsersController {
         log.info("Администратор запрашивает  запрашивает список пользователей. {}", ids);
         List<User> users;
         if (ids != null) {
-            users = userService.getUsers(ids);
+            users = userService.findUsersByIds(ids);
         } else {
-            users = userService.getUsers();
+            users = userService.findAllUsers();
         }
         return users.stream()
                 .map(UserMapper::toUserDto)
@@ -51,7 +51,7 @@ public class AdminUsersController {
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@PathVariable Integer id) {
         log.info("Выполняем поиск пользователя id={}.", id);
-        User user = userService.getUserById(id);
+        User user = userService.findUserById(id);
         return UserMapper.toUserDto(user);
     }
 
@@ -59,7 +59,7 @@ public class AdminUsersController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Validated @RequestBody UserDto userDto) {
         log.info("Создаем нового пользователя {}", userDto.toString());
-        User savedUser = userService.addUser(UserMapper.toUser(userDto));
+        User savedUser = userService.createUser(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(savedUser);
     }
 
@@ -67,7 +67,7 @@ public class AdminUsersController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Integer id) {
         log.info("Удаляем пользователя {}", id);
-        userService.deleteUser(id);
+        userService.removeUser(id);
     }
 
 }

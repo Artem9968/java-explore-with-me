@@ -1,17 +1,17 @@
 package ru.practicum.mainservice.service;
 
+import java.util.List;
 import ru.practicum.mainservice.model.User;
 
-import java.util.List;
-
 public interface UserService {
-    List<User> getUsers();
+    
+    void removeUser(Integer userId);
 
-    List<User> getUsers(List<Integer> ids);
+    User createUser(User user);
 
-    User getUserById(Integer id);
+    User findUserById(Integer userId);
 
-    User addUser(User user);
+    List<User> findUsersByIds(List<Integer> userIds);
 
-    void deleteUser(Integer id);
+    List<User> findAllUsers();
 }

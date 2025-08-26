@@ -1,26 +1,85 @@
 package ru.practicum.mainservice.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mainservice.dto.CompilationDto;
-import ru.practicum.mainservice.dto.NewCompilationDto;
-import ru.practicum.mainservice.dto.PatchCompilationDto;
-import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.mapper.CompilationMapper;
-import ru.practicum.mainservice.model.Compilation;
-import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
+import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.mapper.CompilationMapper;
+import ru.practicum.mainservice.exception.NotFoundException;
+import ru.practicum.mainservice.dto.PatchCompilationDto;
+import ru.practicum.mainservice.model.Compilation;
+import ru.practicum.mainservice.dto.NewCompilationDto;
+import ru.practicum.mainservice.dto.CompilationDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class CompilationServiceImpl implements CompilationService {
-    private final CompilationRepository compilationRepository;
     private final EventService eventService;
+    private final CompilationRepository compilationRepository;
+
+    private Compilation findCompilationOrThrow(Integer compId) {
+        return compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Подборка не существует"));
+    }
+
+    private List<Compilation> getCompilationsBasedOnPinned(Boolean pinned) {
+        return pinned != null ?
+                compilationRepository.findByPinned(pinned) :
+                compilationRepository.findAll();
+    }
+
+    private void updateCompilationFields(Compilation compilation, PatchCompilationDto dto) {
+        if (dto.getTitle() != null) {
+            compilation.setTitle(dto.getTitle());
+        }
+        if (dto.getPinned() != null) {
+            compilation.setPinned(dto.getPinned());
+        }
+        if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
+            updateCompilationEvents(compilation, dto.getEvents());
+        }
+    }
+
+    private void updateCompilationEvents(Compilation compilation, List<Integer> eventIds) {
+        List<Event> events = eventService.findEventsByIdIn(eventIds);
+        compilation.setEvents(new HashSet<>(events));
+    }
+
+    @Override
+    public List<CompilationDto> findAllCompilations(Boolean pinned, Integer from, Integer size) {
+        List<Compilation> compilations = getCompilationsBasedOnPinned(pinned);
+        return compilations.stream()
+                .map(CompilationMapper::toCompilationDto)
+                .skip(from)
+                .limit(size)
+                .toList();
+    }
+
+    @Override
+    public CompilationDto findCompilationById(Integer compId) {
+        Compilation compilation = findCompilationOrThrow(compId);
+        return CompilationMapper.toCompilationDto(compilation);
+    }
+
+    @Override
+    public void removeCompilation(Integer compId) {
+        Compilation compilation = findCompilationOrThrow(compId);
+        compilation.getEvents().clear();
+        compilationRepository.delete(compilation);
+    }
+
+    @Override
+    public CompilationDto updateCompilation(Integer compId, PatchCompilationDto compilationDto) {
+        Compilation compilation = findCompilationOrThrow(compId);
+        updateCompilationFields(compilation, compilationDto);
+        Compilation savedCompilation = compilationRepository.save(compilation);
+        return CompilationMapper.toCompilationDto(savedCompilation);
+    }
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto compilationDto) {
@@ -28,58 +87,6 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
         compilation.setEvents(new HashSet<>(events));
         Compilation savedCompilation = compilationRepository.save(compilation);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedCompilation);
-        return savedCompilationDto;
-    }
-
-    @Override
-    public CompilationDto patchCompilation(Integer compId, PatchCompilationDto compilationDto) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        if (compilationDto.getTitle() != null) {
-            compilation.setTitle(compilationDto.getTitle());
-        }
-        if (compilationDto.getPinned() != null) {
-            compilation.setPinned(compilationDto.getPinned());
-        }
-        if (compilationDto.getEvents() != null) {
-            if (!compilationDto.getEvents().isEmpty()) {
-                List<Event> events = eventService.findEventsByIdIn(compilationDto.getEvents());
-                compilation.setEvents(new HashSet<>(events));
-            }
-        }
-        Compilation savedCompilation = compilationRepository.save(compilation);
-        CompilationDto savedCompilationDto = CompilationMapper.toCompilationDto(savedCompilation);
-        return savedCompilationDto;
-    }
-
-    @Override
-    public void deleteCompilation(Integer compId) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        compilation.getEvents().clear();
-        compilationRepository.delete(compilation);
-    }
-
-    @Override
-    public CompilationDto getCompilation(Integer compId) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Не найдена подборка id=" + compId));
-        return CompilationMapper.toCompilationDto(compilation);
-    }
-
-    @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
-        List<Compilation> compilations;
-        if (pinned != null) {
-            compilations = compilationRepository.findByPinned(pinned);
-        } else {
-            compilations = compilationRepository.findAll();
-        }
-        return compilations.stream()
-                .map(CompilationMapper::toCompilationDto)
-                .skip(from)
-                .limit(size)
-                .toList();
+        return CompilationMapper.toCompilationDto(savedCompilation);
     }
 }

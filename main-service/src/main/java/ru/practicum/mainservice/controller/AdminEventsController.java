@@ -48,6 +48,6 @@ public class AdminEventsController {
     public EventFullDto updateEvent(@PathVariable Integer eventId,
                                     @RequestBody @Validated UpdateEventAdminRequest eventDto) {
         log.info("Администратор редактирует событие id={}. {}", eventId, eventDto);
-        return eventService.adminUpdateEvent(eventId, eventDto);
+        return eventService.updateEventByAdmin(eventId, eventDto);
     }
 }

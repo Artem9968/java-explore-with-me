@@ -1,19 +1,20 @@
 package ru.practicum.mainservice.service;
 
+import java.util.List;
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.model.Category;
 
-import java.util.List;
-
 public interface CategoryService {
-    CategoryDto createCategory(NewCategoryDto categoryDto);
+
+    List<Category> findAll();
+
+    Category findById(Integer id);
+
+    void removeById(Integer id);
 
     CategoryDto updateCategory(Integer id, NewCategoryDto categoryDto);
 
-    void deleteCategory(Integer id);
+    CategoryDto createCategory(NewCategoryDto categoryDto);
 
-    Category getCategoryById(Integer id);
-
-    List<Category> getAllCategories();
 }

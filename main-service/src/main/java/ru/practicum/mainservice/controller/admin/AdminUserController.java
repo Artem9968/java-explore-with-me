@@ -45,14 +45,6 @@ public class AdminUserController {
                 .toList();
     }
 
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto getUserById(@PathVariable Integer userId) {
-        log.info("Ищем пользователя с id={}.", userId);
-        User user = userService.findUserById(userId);
-        return UserMapper.toUserDto(user);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@Validated @RequestBody UserDto newUserDto) {

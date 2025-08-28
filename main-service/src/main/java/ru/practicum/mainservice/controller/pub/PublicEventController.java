@@ -12,17 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.dto.category.CategoryDto;
-import ru.practicum.mainservice.dto.compilation.CompilationDto;
 import ru.practicum.mainservice.dto.event.EventFullDto;
 import ru.practicum.mainservice.dto.event.EventShortDto;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.mapper.category.CategoryMapper;
 import ru.practicum.mainservice.mapper.event.EventMapper;
 import ru.practicum.mainservice.model.event.Event;
 import ru.practicum.mainservice.model.enums.EventState;
-import ru.practicum.mainservice.service.category.CategoryService;
-import ru.practicum.mainservice.service.compilation.CompilationService;
 import ru.practicum.mainservice.service.event.EventService;
 import ru.practicum.statsclient.StatsClient;
 
@@ -31,21 +26,18 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping()
+@RequestMapping("/events")
 public class PublicEventController {
     private final StatsClient statsClient;
     private final EventService eventService;
-    private final CompilationService compilationService;
-    private final CategoryService categoryService;
 
     @Value("${spring.application.name}")
     private String applicationName;
 
-    @GetMapping("/events/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto findEventById(@PathVariable("id") int id, HttpServletRequest request) {
         log.info("Запрос события по id={}", id);
-
         statsClient.hitInfo(applicationName, request.getRequestURI(), request.getRemoteAddr());
         log.info("Хит отправлен в stats-service");
 
@@ -64,8 +56,7 @@ public class PublicEventController {
         return dto;
     }
 
-
-    @GetMapping("/events")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> findAllEvents(
             @RequestParam(name = "text", required = false) String text,
@@ -87,42 +78,6 @@ public class PublicEventController {
 
         return eventService.findEventsByParameters(text, categories, paid, rangeStart,
                 rangeEnd, onlyAvailable, sort, from, size);
-    }
-
-    @GetMapping("/compilations")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CompilationDto> findAllCompilations(
-            @RequestParam(name = "pinned", required = false) Boolean pinned,
-            @RequestParam(name = "from", defaultValue = "0") Integer from,
-            @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Пользователь запрашивает список подборок.");
-        return compilationService.findAllCompilations(pinned, from, size);
-    }
-
-    @GetMapping("/compilations/{compId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CompilationDto findCompilationById(@PathVariable("compId") int compId) {
-        log.info("Пользователь запрашивает подборку id={}", compId);
-        return compilationService.findCompilationById(compId);
-    }
-
-    @GetMapping("/categories")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> findCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
-                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Пользователь запрашивает список категорий.");
-        return categoryService.findAll().stream()
-                .map(CategoryMapper::toDto)
-                .skip(from)
-                .limit(size)
-                .toList();
-    }
-
-    @GetMapping("/categories/{catId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CategoryDto findCategoryById(@PathVariable("catId") int catId) {
-        log.info("Пользователь запрашивает категорию id={}", catId);
-        return CategoryMapper.toDto(categoryService.findById(catId));
     }
 }
 

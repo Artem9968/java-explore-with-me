@@ -143,7 +143,7 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
     }
 
-        @Override
+    @Override
     @Transactional
     public void removeComment(Integer authorId, Integer commentId) {
         Comment entity = commentRepository.findById(commentId)

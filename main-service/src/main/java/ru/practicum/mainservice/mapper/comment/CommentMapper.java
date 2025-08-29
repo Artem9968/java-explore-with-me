@@ -18,12 +18,12 @@ public class CommentMapper {
 
     public static CommentDto toDto(Comment result) {
         CommentDto dto = new CommentDto();
-        dto.setId(result .getId());
-        dto.setAuthor(UserMapper.toUserDto(result .getAuthor()));
-        dto.setEventId(result .getEventId());
-        dto.setText(result .getText());
-        dto.setCreatedOn(result .getCreatedOn());
-        dto.setEditedOn(result .getEditedOn());
+        dto.setId(result.getId());
+        dto.setAuthor(UserMapper.toUserDto(result.getAuthor()));
+        dto.setEventId(result.getEventId());
+        dto.setText(result.getText());
+        dto.setCreatedOn(result.getCreatedOn());
+        dto.setEditedOn(result.getEditedOn());
         return dto;
     }
 }

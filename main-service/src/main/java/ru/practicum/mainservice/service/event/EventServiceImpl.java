@@ -1,10 +1,14 @@
 package ru.practicum.mainservice.service.event;
 
+import ru.practicum.mainservice.dto.category.CategoryDto;
+import ru.practicum.mainservice.dto.comment.CommentDto;
 import ru.practicum.mainservice.dto.event.EventFullDto;
 import ru.practicum.mainservice.dto.event.EventShortDto;
+import ru.practicum.mainservice.dto.event.EventWithCommentsDto;
 import ru.practicum.mainservice.dto.event.NewEventDto;
 import ru.practicum.mainservice.dto.event.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.event.UpdateEventUserRequest;
+import ru.practicum.mainservice.dto.user.UserShortDto;
 import ru.practicum.mainservice.service.user.UserService;
 import ru.practicum.mainservice.service.category.CategoryService;
 import ru.practicum.statsdto.StatsDto;
@@ -402,4 +406,28 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         return EventMapper.toFullDto(savedEvent);
     }
+
+    @Override
+    public EventWithCommentsDto buildEventWithComments(Event event, List<CommentDto> comments) {
+        return EventWithCommentsDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .annotation(event.getAnnotation())
+                .description(event.getDescription())
+                .category(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()))
+                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .requestModeration(event.getRequestModeration())
+                .state(event.getState())
+                .confirmedRequests(event.getCachedConfirmedRequests())
+                .views(event.getCachedViews())
+                .eventDate(event.getEventDate())
+                .createdOn(event.getCreatedOn())
+                .publishedOn(event.getPublishedOn())
+                .comments(comments)
+                .commentsCount(comments != null ? comments.size() : 0)
+                .build();
+    }
+
 }

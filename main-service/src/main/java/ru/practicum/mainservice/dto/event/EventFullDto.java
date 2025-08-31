@@ -2,8 +2,11 @@ package ru.practicum.mainservice.dto.event;
 
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.Getter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ru.practicum.mainservice.dto.comment.CommentDto;
 import ru.practicum.mainservice.dto.user.UserShortDto;
 import ru.practicum.mainservice.dto.category.CategoryDto;
 import ru.practicum.mainservice.model.event.Location;
@@ -50,4 +53,8 @@ public class EventFullDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
+
+    private Integer commentsCount;
+
+    private List<CommentDto> comments;
 }

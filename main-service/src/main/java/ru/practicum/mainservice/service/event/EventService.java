@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.service.event;
 
+import ru.practicum.mainservice.dto.comment.CommentDto;
 import ru.practicum.mainservice.dto.event.EventFullDto;
 import ru.practicum.mainservice.dto.event.EventShortDto;
 import ru.practicum.mainservice.dto.event.NewEventDto;
@@ -41,4 +42,6 @@ public interface EventService {
     EventFullDto findUserEventById(Integer eventId, Integer userId);
 
     EventFullDto createEvent(NewEventDto newEventDto, Integer userId);
+
+    EventFullDto buildEventWithComments(Event event, List<CommentDto> comments);
 }

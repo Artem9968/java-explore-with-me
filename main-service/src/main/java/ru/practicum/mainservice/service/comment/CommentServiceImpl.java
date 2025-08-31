@@ -155,5 +155,27 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.delete(entity);
     }
+
+    @Transactional
+    @Override
+    public CommentDto updateCommentByAdmin(Integer eventId, Integer commentId, CommentCreateDto updateDto) {
+        Comment entity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+
+        entity.setText(updateDto.getText());
+        entity.setEditedOn(LocalDateTime.now());
+
+        Comment updated = commentRepository.save(entity);
+        return CommentMapper.toDto(updated);
+    }
+
+    @Transactional
+    @Override
+    public void removeCommentByAdmin(Integer eventId, Integer commentId) {
+        Comment entity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+
+        commentRepository.delete(entity);
+    }
 }
 

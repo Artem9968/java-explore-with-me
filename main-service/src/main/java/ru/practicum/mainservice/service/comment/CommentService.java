@@ -25,4 +25,8 @@ public interface CommentService {
     List<CommentDto> findCommentsByAuthor(Integer authorId, Integer from, Integer size);
 
     void removeComment(Integer authorId, Integer commentId);
+
+    CommentDto updateCommentByAdmin(Integer eventId, Integer commentId, CommentCreateDto updateDto);
+
+    void removeCommentByAdmin(Integer eventId, Integer commentId);
 }

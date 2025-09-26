@@ -1,2 +1,2 @@
+Diploma project, filling database of the main server (mainserver) with topics - cultural activities with their detailed description and geolocation. Tracking the activity of views by statistics server (server) for building a popularity rating + tracking followers. The (client) is a server for processing API requests from client applications and linking information from the main server and the statistics server.
 Фича feature_comments
-Ссылка ПР : https://github.com/Artem9968/java-explore-with-me/pull/3 
